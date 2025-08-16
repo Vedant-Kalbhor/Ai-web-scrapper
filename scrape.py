@@ -14,8 +14,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 options = Options()
-# options.add_argument("--headless")  # optional: run without GUI
+# options.add_argument("--headless") # optional: run without GUI
 
+def get_vulnerability_urls():
+    """
+    Returns a list of URLs for websites that list top cybersecurity vulnerabilities.
+    """
+    return [
+        "https://www.cm-alliance.com/cybersecurity-blog/top-10-biggest-cyber-attacks-of-2024-25-other-attacks-to-know-about",
+        "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+        "https://www.tenable.com/cve/newest",
+        "https://nvd.nist.gov/vuln/detail/CVE-2025-23006"
+
+    ]
 
 
 def scrape_website(website):

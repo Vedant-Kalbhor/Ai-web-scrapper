@@ -1,6 +1,6 @@
-
 import streamlit as st
 from scrape import (
+    get_vulnerability_urls,
     scrape_website,
     extract_body_content,
     clean_body_content,
@@ -8,37 +8,54 @@ from scrape import (
 )
 from parse import parse_with_gemini
 
-# Streamlit UI
-st.title("AI Web Scraper")
-url = st.text_input("Enter Website URL")
+def save_report(report_content):
+    """
+    Saves the parsed vulnerability report to a text file.
+    """
+    with open("vulnerability_report.txt", "w", encoding="utf-8") as f:
+        f.write(report_content)
 
-# Step 1: Scrape the Website
-if st.button("Scrape Website"):
-    if url:
-        st.write("Scraping the website...")
+def run_scraper_and_parser():
+    """
+    Orchestrates the entire process of scraping, parsing, and generating the report.
+    """
+    st.write("Starting the vulnerability scan...")
 
-        # Scrape the website
+    # Step 1: Get URLs
+    urls = get_vulnerability_urls()
+    st.write(f"Found {len(urls)} website(s) to scan.")
+
+    all_parsed_content = []
+
+    for url in urls:
+        st.write(f"Scraping: {url}")
+        # Step 2: Scrape the Website
         dom_content = scrape_website(url)
         body_content = extract_body_content(dom_content)
         cleaned_content = clean_body_content(body_content)
 
-        # Store the DOM content in Streamlit session state
-        st.session_state.dom_content = cleaned_content
+        # Step 3: Parse the Content with Gemini
+        st.write("Parsing content with Gemini...")
+        dom_chunks = split_dom_content(cleaned_content)
+        parsed_result = parse_with_gemini(dom_chunks)
+        all_parsed_content.append(parsed_result)
 
-        # Display the DOM content in an expandable text box
-        with st.expander("View DOM Content"):
-            st.text_area("DOM Content", cleaned_content, height=300)
+    # Step 4: Combine and Save the Report
+    final_report = "\n\n".join(all_parsed_content)
+    save_report(final_report)
 
+    st.success("Vulnerability report generated successfully!")
+    st.download_button(
+        label="Download Report",
+        data=final_report,
+        file_name="vulnerability_report.txt",
+        mime="text/plain"
+    )
 
-# Step 2: Ask Questions About the DOM Content
-if "dom_content" in st.session_state:
-    parse_description = st.text_area("Describe what you want to parse")
+# Streamlit UI
+st.title("Automated Cybersecurity Vulnerability Scanner")
 
-    if st.button("Parse Content"):
-        if parse_description:
-            st.write("Parsing the content...")
+if st.button("Generate Vulnerability Report"):
+    run_scraper_and_parser()
 
-            # Parse the content with Gemini instead of Ollama
-            dom_chunks = split_dom_content(st.session_state.dom_content)
-            parsed_result = parse_with_gemini(dom_chunks, parse_description)
-            st.write(parsed_result)
+    
