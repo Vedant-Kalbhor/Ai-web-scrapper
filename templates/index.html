@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cybersecurity Vulnerability Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 { color: #333; }
+        form { margin: 20px 0; }
+        button {
+            background: #007bff;
+            border: none;
+            padding: 12px 20px;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+        a:hover { background: #1e7e34; }
+        .loading {
+            font-size: 18px;
+            color: #555;
+            margin-top: 30px;
+        }
+        .error {
+            color: red;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 Automated Cybersecurity Vulnerability Scanner</h1>
+    <p>Click the button below to start scanning vulnerabilities.</p>
+
+    {% if not download_ready and not error %}
+        <form action="/scan" method="POST">
+            <button type="submit">🚀 Generate Vulnerability Report</button>
+        </form>
+    {% endif %}
+
+    {% if download_ready %}
+        <a href="/get_report">⬇️ Download Report</a>
+    {% endif %}
+
+    {% if error %}
+        <p class="error">⚠️ Error: {{ error }}</p>
+    {% endif %}
+
+    {% if request.path == "/scanning" %}
+        <div class="loading">⏳ Scanning in progress… Please wait.</div>
+    {% endif %}
+</body>
+</html>
