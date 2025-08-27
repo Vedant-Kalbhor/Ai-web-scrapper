@@ -8,7 +8,8 @@ def get_vulnerability_urls():
     # Replace with actual sources you want to scrape
     return [
         "https://nvd.nist.gov/vuln/recent",
-        "https://www.securityweek.com/"
+        "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+        
     ]
 
 def scrape_content(url):

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vulnerability Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2.5em;
+        }
+
+        .download-button {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 30px auto;
+            padding: 12px 25px;
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #e0e6ed;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            color: #555;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+
+        tr:hover {
+            background-color: #f1f4f8;
+        }
+
+        td a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        td a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Vulnerability Dashboard</h1>
+        <button onclick="window.location.href='/get_report'" class="download-button">
+            ⬇️ Download Report
+        </button>
+
+        <div class="charts-grid">
+            <div class="card">
+                <h3>Severity Distribution</h3>
+                <canvas id="severityChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>CVEs Over Time</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Latest 10 CVEs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CVE ID</th>
+                        <th>Description</th>
+                        <th>Severity</th>
+                        <th>CVSS Score</th>
+                        <th>Vendor</th>
+                        <th>Product</th>
+                    </tr>
+                </thead>
+                <tbody id="cveTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            const res = await fetch("/api/vulnerabilities");
+            const cves = await res.json();
+
+            // --- Severity Distribution ---
+            const severityCounts = { HIGH: 0, MEDIUM: 0, LOW: 0, NONE: 0 };
+            cves.forEach(cve => {
+                const sev = (cve.severity || "NONE").toUpperCase();
+                severityCounts[sev] = (severityCounts[sev] || 0) + 1;
+            });
+
+            new Chart(document.getElementById("severityChart"), {
+                type: "pie",
+                data: {
+                    labels: Object.keys(severityCounts),
+                    datasets: [{
+                        data: Object.values(severityCounts),
+                        backgroundColor: ["#e74c3c", "#f39c12", "#2ecc71", "#bdc3c7"], // Vibrant & professional colors
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false,
+                        }
+                    }
+                }
+            });
+
+            // --- CVEs Over Time ---
+            const dateCounts = {};
+            cves.forEach(cve => {
+                const date = cve.published?.split("T")[0] || "unknown";
+                dateCounts[date] = (dateCounts[date] || 0) + 1;
+            });
+
+            // Sort dates for correct trend display
+            const sortedDates = Object.keys(dateCounts).sort();
+            const sortedDateCounts = sortedDates.map(date => dateCounts[date]);
+
+            new Chart(document.getElementById("trendChart"), {
+                type: "line",
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: "CVEs Published",
+                        data: sortedDateCounts,
+                        borderColor: "#3498db", // Professional blue
+                        backgroundColor: "rgba(52, 152, 219, 0.2)", // Light fill for aesthetics
+                        fill: true,
+                        tension: 0.3, // Smoother line
+                        pointBackgroundColor: "#3498db",
+                        pointBorderColor: "#fff",
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: "#3498db"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number of CVEs'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // --- Table (latest 10 CVEs) ---
+            const table = document.getElementById("cveTable");
+            table.innerHTML = ''; // Clear existing rows
+            cves.slice(0, 10).forEach(cve => {
+                const row = `<tr>
+                    <td><a href="https://nvd.nist.gov/vuln/detail/${cve.id}" target="_blank">${cve.id}</a></td>
+                    <td>${(cve.description || "No description provided").slice(0, 100)}...</td>
+                    <td>${cve.severity || "N/A"}</td>
+                    <td>${cve.cvss_score || "N/A"}</td>
+                    <td>${cve.vendor || "N/A"}</td>
+                    <td>${cve.product || "N/A"}</td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+        }
+        loadData();
+    </script>
+</body>
+</html>

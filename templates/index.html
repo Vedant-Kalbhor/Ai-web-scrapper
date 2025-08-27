@@ -2,68 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cybersecurity Vulnerability Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Inter', sans-serif;
         }
-        h1 { color: #333; }
-        form { margin: 20px 0; }
-        button {
-            background: #007bff;
-            border: none;
-            padding: 12px 20px;
-            color: white;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #93c5fd);
         }
-        button:hover { background: #0056b3; }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            text-decoration: none;
-            background: #28a745;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
         }
-        a:hover { background: #1e7e34; }
-        .loading {
-            font-size: 18px;
-            color: #555;
-            margin-top: 30px;
+        .btn-primary {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .error {
-            color: red;
-            margin-top: 20px;
-            font-weight: bold;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
-<body>
-    <h1>🔒 Automated Cybersecurity Vulnerability Scanner</h1>
-    <p>Click the button below to start scanning vulnerabilities.</p>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="card w-full max-w-lg mx-auto rounded-2xl shadow-2xl p-8 md:p-12 text-center">
+        <div class="mb-8">
+            <svg class="w-20 h-20 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Automated Vulnerability Scanner</h1>
+        
+        {% if download_ready %}
+            <p class="text-gray-600 mb-8 text-lg">Your vulnerability report is ready for download.</p>
+            <a href="/get_report" class="btn-primary inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-lg">
+                <svg class="inline-block w-6 h-6 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download Report
+            </a>
+             <a href="/" class="mt-4 inline-block text-blue-600 hover:text-blue-800">Scan another site</a>
+        {% else %}
+            <p class="text-gray-600 mb-8 text-lg">Click the button below to start scanning for the latest cybersecurity vulnerabilities.</p>
+            <form action="/scan" method="POST">
+                <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg">
+                    <svg class="inline-block w-6 h-6 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    Generate Vulnerability Report
+                </button>
+            </form>
+        {% endif %}
 
-    {% if not download_ready and not error %}
-        <form action="/scan" method="POST">
-            <button type="submit">🚀 Generate Vulnerability Report</button>
-        </form>
-    {% endif %}
-
-    {% if download_ready %}
-        <a href="/get_report">⬇️ Download Report</a>
-    {% endif %}
-
-    {% if error %}
-        <p class="error">⚠️ Error: {{ error }}</p>
-    {% endif %}
-
-    {% if request.path == "/scanning" %}
-        <div class="loading">⏳ Scanning in progress… Please wait.</div>
-    {% endif %}
+        {% if error %}
+            <div class="mt-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                <strong class="font-bold">Error:</strong>
+                <span class="block sm:inline">{{ error }}</span>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

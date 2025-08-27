@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scanning in Progress</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3b82f6;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Button pulse animation */
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+      50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.9); }
+    }
+    .animate-pulse-glow {
+      animation: pulse-glow 2s infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center text-center p-4">
+  
+  <!-- Loading Section -->
+  <div id="loading" class="flex flex-col items-center">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">⏳ Scanning in Progress</h1>
+    <div class="spinner"></div>
+    <p class="mt-6 text-gray-600">We’re scraping and analyzing vulnerabilities. This may take a few moments...</p>
+  </div>
+
+  <!-- Result Section -->
+  <div id="result" class="hidden mt-8">
+    <button 
+      onclick="window.location.href='/dashboard'" 
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl text-xl transition transform hover:scale-110 animate-pulse-glow">
+      🚀 Go to Dashboard
+    </button>
+  </div>
+
+  <!-- Error Section -->
+  <div id="error-section" class="hidden mt-8 text-red-600 font-bold"></div>
+
+<script>
+  async function checkStatus() {
+    const res = await fetch("/status");
+    const data = await res.json();
+    if (data.download_ready) {   
+      document.getElementById("loading").style.display = "none";   // hide spinner
+      document.getElementById("result").classList.remove("hidden"); // show button
+    } else if (data.error) {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("error-section").innerText = data.error;
+      document.getElementById("error-section").classList.remove("hidden");
+    } else {
+      setTimeout(checkStatus, 4000);
+    }
+  }
+  checkStatus();
+</script>
+
+</body>
+</html>
