@@ -23,9 +23,16 @@
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-weight: 600;
             font-size: 2.5em;
+        }
+
+        #lastUpdated {
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 0.95em;
         }
 
         .download-button {
@@ -113,13 +120,36 @@
             color: #2980b9;
             text-decoration: underline;
         }
+
+        /* AI Insights styling */
+        .insights-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fdfdfd;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .insights-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .insights-content {
+            white-space: pre-wrap;
+            font-size: 1em;
+            color: #444;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔒 Vulnerability Dashboard</h1>
+        <p id="lastUpdated"></p>
+
         <button onclick="window.location.href='/get_report'" class="download-button">
             ⬇️ Download Report
+        </button>
+        <button onclick="window.location.href='/mitigation'" class="download-button">
+            🔎 Go to Mitigation Finder
         </button>
 
         <div class="charts-grid">
@@ -149,12 +179,22 @@
                 <tbody id="cveTable"></tbody>
             </table>
         </div>
+
+        <!-- 🔹 AI Insights Section -->
+        <div class="insights-box">
+            <h3>🤖 AI Insights</h3>
+            <p id="insights-text">Loading AI analysis...</p>
+        </div>
     </div>
 
     <script>
         async function loadData() {
             const res = await fetch("/api/vulnerabilities");
-            const cves = await res.json();
+            const data = await res.json();
+
+            const cves = data.vulnerabilities || [];
+            document.getElementById("lastUpdated").innerText = 
+                data.generated_at ? "Last Updated: " + data.generated_at : "";
 
             // --- Severity Distribution ---
             const severityCounts = { HIGH: 0, MEDIUM: 0, LOW: 0, NONE: 0 };
@@ -169,21 +209,11 @@
                     labels: Object.keys(severityCounts),
                     datasets: [{
                         data: Object.values(severityCounts),
-                        backgroundColor: ["#e74c3c", "#f39c12", "#2ecc71", "#bdc3c7"], // Vibrant & professional colors
+                        backgroundColor: ["#e74c3c", "#f39c12", "#2ecc71", "#bdc3c7"],
                         hoverOffset: 10
                     }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: false,
-                        }
-                    }
-                }
+                options: { responsive: true }
             });
 
             // --- CVEs Over Time ---
@@ -193,7 +223,6 @@
                 dateCounts[date] = (dateCounts[date] || 0) + 1;
             });
 
-            // Sort dates for correct trend display
             const sortedDates = Object.keys(dateCounts).sort();
             const sortedDateCounts = sortedDates.map(date => dateCounts[date]);
 
@@ -204,47 +233,18 @@
                     datasets: [{
                         label: "CVEs Published",
                         data: sortedDateCounts,
-                        borderColor: "#3498db", // Professional blue
-                        backgroundColor: "rgba(52, 152, 219, 0.2)", // Light fill for aesthetics
+                        borderColor: "#3498db",
+                        backgroundColor: "rgba(52, 152, 219, 0.2)",
                         fill: true,
-                        tension: 0.3, // Smoother line
-                        pointBackgroundColor: "#3498db",
-                        pointBorderColor: "#fff",
-                        pointHoverBackgroundColor: "#fff",
-                        pointHoverBorderColor: "#3498db"
+                        tension: 0.3
                     }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: false,
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Number of CVEs'
-                            },
-                            beginAtZero: true
-                        }
-                    }
-                }
+                options: { responsive: true }
             });
 
-            // --- Table (latest 10 CVEs) ---
+            // --- Table ---
             const table = document.getElementById("cveTable");
-            table.innerHTML = ''; // Clear existing rows
+            table.innerHTML = '';
             cves.slice(0, 10).forEach(cve => {
                 const row = `<tr>
                     <td><a href="https://nvd.nist.gov/vuln/detail/${cve.id}" target="_blank">${cve.id}</a></td>
@@ -257,7 +257,20 @@
                 table.innerHTML += row;
             });
         }
+
+        async function loadAIInsights() {
+            try {
+                const res = await fetch("/ai_insights");
+                const data = await res.json();
+                document.getElementById("insights-text").innerText =
+                    data.insights || "⚠️ Could not load insights.";
+            } catch (err) {
+                document.getElementById("insights-text").innerText = "⚠️ Error loading AI insights.";
+            }
+        }
+
         loadData();
+        loadAIInsights();
     </script>
 </body>
 </html>
