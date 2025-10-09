@@ -3,61 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cybersecurity Vulnerability Scanner</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Vulnerability Scanner - AI-Powered Security Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #93c5fd);
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
         }
-        .card {
-            background-color: rgba(255, 255, 255, 0.9);
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            color: #333;
         }
-        .btn-primary {
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .feature p {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .scan-btn {
+            padding: 20px 50px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .info-item {
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sources {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .sources h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .source-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .source-tag {
+            padding: 8px 16px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5em; }
+            .hero p { font-size: 1.1em; }
+            .main-card { padding: 30px 20px; }
+            .features { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
-    <div class="card w-full max-w-lg mx-auto rounded-2xl shadow-2xl p-8 md:p-12 text-center">
-        <div class="mb-8">
-            <svg class="w-20 h-20 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🛡️ AI-Powered Vulnerability Scanner</h1>
+            <p>Automated security intelligence that scrapes, analyzes, and reports the latest cybersecurity vulnerabilities in real-time</p>
         </div>
-        
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Automated Vulnerability Scanner</h1>
-        
-        {% if download_ready %}
-            <p class="text-gray-600 mb-8 text-lg">Your vulnerability report is ready for download.</p>
-            <a href="/get_report" class="btn-primary inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-lg">
-                <svg class="inline-block w-6 h-6 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Download Report
-            </a>
-             <a href="/" class="mt-4 inline-block text-blue-600 hover:text-blue-800">Scan another site</a>
-        {% else %}
-            <p class="text-gray-600 mb-8 text-lg">Click the button below to start scanning for the latest cybersecurity vulnerabilities.</p>
-            <form action="/scan" method="POST">
-                <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg">
-                    <svg class="inline-block w-6 h-6 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    Generate Vulnerability Report
-                </button>
-            </form>
-        {% endif %}
 
-        {% if error %}
-            <div class="mt-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
-                <strong class="font-bold">Error:</strong>
-                <span class="block sm:inline">{{ error }}</span>
+        <div class="main-card">
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Multi-Source Scraping</h3>
+                    <p>Aggregates data from NVD, CISA, and other trusted security sources</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Analysis</h3>
+                    <p>Gemini AI parses and structures vulnerability data with intelligent insights</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Visual Dashboard</h3>
+                    <p>Interactive charts and severity breakdowns for quick assessment</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Mitigation Finder</h3>
+                    <p>Instant AI-powered solutions and remediation steps for any CVE</p>
+                </div>
             </div>
-        {% endif %}
+
+            <div class="cta-section">
+                <h2>Start Your Security Scan</h2>
+                <form action="/scan" method="POST">
+                    <button type="submit" class="scan-btn">
+                        🚀 Generate Vulnerability Report
+                    </button>
+                </form>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-value">2+</div>
+                    <div class="info-label">Data Sources</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">50+</div>
+                    <div class="info-label">CVEs Tracked</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">AI</div>
+                    <div class="info-label">Powered</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">Real-time</div>
+                    <div class="info-label">Updates</div>
+                </div>
+            </div>
+
+            <div class="sources">
+                <h3>📡 Data Sources</h3>
+                <div class="source-list">
+                    <span class="source-tag">NVD (NIST)</span>
+                    <span class="source-tag">CISA KEV Catalog</span>
+                    <span class="source-tag">+ More</span>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

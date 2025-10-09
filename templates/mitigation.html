@@ -1,82 +1,406 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Find Mitigation</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitigation Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #f8f9fa; }
-        .result-box {
-            background: #ffffff;
-            border-radius: 12px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-            font-size: 16px;
-            line-height: 1.6;
+            color: #333;
         }
-        .result-box h5 {
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 18px 25px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
             font-weight: 600;
-            color: #0d6efd;
-            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
-        .result-section { margin-bottom: 15px; }
-        ul { padding-left: 20px; }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .examples {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-tag {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .vuln-id {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .severity-badge {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .severity-critical { background: #dc3545; color: white; }
+        .severity-high { background: #fd7e14; color: white; }
+        .severity-medium { background: #ffc107; color: #333; }
+        .severity-low { background: #28a745; color: white; }
+        .severity-unknown { background: #6c757d; color: white; }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: #555;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+
+        .references {
+            list-style: none;
+        }
+
+        .references li {
+            margin-bottom: 12px;
+        }
+
+        .references a {
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .references a:hover {
+            color: #764ba2;
+            transform: translateX(5px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-box {
+            background: #fff5f5;
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .search-box { flex-direction: column; }
+            .result-header { flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
-<body class="container p-4">
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
 
-    <h2 class="mb-3">🔒 Mitigation Finder</h2>
-    <p>Enter a CVE ID or vulnerability description:</p>
+        <div class="header">
+            <h1>🔒 Mitigation Finder</h1>
+            <p>Get instant mitigation guidance for any vulnerability</p>
+        </div>
 
-    <div class="input-group mb-3">
-        <input id="query" class="form-control" placeholder="e.g., CVE-2025-1234 or 'Apache buffer overflow'">
-        <button class="btn btn-primary" onclick="findMitigation()">Find Mitigation</button>
+        <div class="search-card">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Enter CVE ID or describe a vulnerability..."
+                    onkeypress="if(event.key==='Enter') findMitigation()"
+                >
+                <button class="search-btn" id="searchBtn" onclick="findMitigation()">
+                    🔍 Find Solution
+                </button>
+            </div>
+
+            <div class="examples">
+                <span style="font-size: 0.9em; color: #666; margin-right: 10px;">Examples:</span>
+                <div class="example-tag" onclick="setQuery('CVE-2024-1234')">CVE-2024-1234</div>
+                <div class="example-tag" onclick="setQuery('Apache Log4j vulnerability')">Log4j</div>
+                <div class="example-tag" onclick="setQuery('SQL injection')">SQL Injection</div>
+                <div class="example-tag" onclick="setQuery('Remote code execution')">RCE</div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden"></div>
     </div>
 
-    <div id="result" class="result-box" style="display:none;"></div>
-
     <script>
+        function setQuery(text) {
+            document.getElementById('searchInput').value = text;
+            findMitigation();
+        }
+
         async function findMitigation() {
-            const query = document.getElementById("query").value;
-            const resultBox = document.getElementById("result");
+            const query = document.getElementById('searchInput').value.trim();
+            const container = document.getElementById('resultContainer');
+            const btn = document.getElementById('searchBtn');
 
-            resultBox.style.display = "block";
-            resultBox.innerHTML = "<em>⏳ Searching for mitigation...</em>";
-
-            const res = await fetch("/api/mitigation", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query })
-            });
-
-            const data = await res.json();
-
-            if (data.error) {
-                resultBox.innerHTML = "<strong>❌ Error:</strong> " + data.error;
+            if (!query) {
+                alert('Please enter a CVE ID or vulnerability description');
                 return;
             }
 
-            // ✅ Build formatted HTML from JSON
-            let html = "";
+            // Show loading state
+            btn.disabled = true;
+            btn.textContent = '⏳ Searching...';
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="result-card">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p style="color: #666; font-size: 1.1em;">Analyzing vulnerability and finding solutions...</p>
+                    </div>
+                </div>
+            `;
 
-            if (data.vulnerability) {
-                html += `<div class="result-section"><h5>Vulnerability</h5><p>${data.vulnerability}</p></div>`;
-            }
-            if (data.summary) {
-                html += `<div class="result-section"><h5>Summary</h5><p>${data.summary}</p></div>`;
-            }
-            if (data.mitigation) {
-                html += `<div class="result-section"><h5>Mitigation</h5><p>${data.mitigation}</p></div>`;
-            }
-            if (data.references && data.references.length > 0) {
-                html += `<div class="result-section"><h5>References</h5><ul>`;
-                data.references.forEach(ref => {
-                    html += `<li><a href="${ref}" target="_blank">${ref}</a></li>`;
+            try {
+                const res = await fetch('/api/mitigation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
                 });
-                html += `</ul></div>`;
+
+                const data = await res.json();
+
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    showResult(data);
+                }
+            } catch (err) {
+                showError('Failed to connect to server. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Find Solution';
+            }
+        }
+
+        function showResult(data) {
+            const severity = (data.severity || 'UNKNOWN').toUpperCase();
+            
+            let html = `
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="vuln-id">${data.vulnerability || 'Unknown'}</div>
+                        <div class="severity-badge severity-${severity.toLowerCase()}">${severity}</div>
+                    </div>
+            `;
+
+            if (data.summary) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">📝 Summary</div>
+                        <div class="section-content">${data.summary}</div>
+                    </div>
+                `;
             }
 
-            resultBox.innerHTML = html || "<p>No structured mitigation details found.</p>";
+            if (data.mitigation) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">🛡️ Mitigation Steps</div>
+                        <div class="section-content">${data.mitigation}</div>
+                    </div>
+                `;
+            }
+
+            if (data.references && data.references.length > 0) {
+                html += `
+                    <div class="section">
+                        <div class="section-title">🔗 References</div>
+                        <ul class="references">
+                `;
+                data.references.forEach(ref => {
+                    html += `<li><a href="${ref}" target="_blank">🌐 ${ref}</a></li>`;
+                });
+                html += `
+                        </ul>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            document.getElementById('resultContainer').innerHTML = html;
+        }
+
+        function showError(message) {
+            document.getElementById('resultContainer').innerHTML = `
+                <div class="result-card">
+                    <div class="error-box">
+                        <h3 style="margin-bottom: 10px;">⚠️ Error</h3>
+                        <p>${message}</p>
+                    </div>
+                </div>
+            `;
         }
     </script>
 </body>

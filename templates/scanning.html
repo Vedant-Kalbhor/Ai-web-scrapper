@@ -1,72 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Scanning in Progress</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #3b82f6;
-      border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    /* Button pulse animation */
-    @keyframes pulse-glow {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
-      50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.9); }
-    }
-    .animate-pulse-glow {
-      animation: pulse-glow 2s infinite;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanning in Progress</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .scanner-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 50px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+        }
+
+        .progress-ring-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .radar {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .radar-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .radar-circle:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .radar-circle:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .radar-line {
+            width: 2px;
+            height: 75px;
+            background: white;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .progress-text {
+            font-size: 1em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: white;
+            transform: scale(1.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .step.completed {
+            background: #4ade80;
+        }
+
+        .dashboard-btn {
+            display: inline-block;
+            padding: 18px 40px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .dashboard-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 40px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        .error-box {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid rgba(220, 53, 69, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .hidden { display: none; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center text-center p-4">
-  
-  <!-- Loading Section -->
-  <div id="loading" class="flex flex-col items-center">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">⏳ Scanning in Progress</h1>
-    <div class="spinner"></div>
-    <p class="mt-6 text-gray-600">We’re scraping and analyzing vulnerabilities. This may take a few moments...</p>
-  </div>
+<body>
+    <div class="container">
+        <div id="scanning-section" class="scanner-container">
+            <h1>🔍 Scanning Vulnerabilities</h1>
+            
+            <div class="radar">
+                <div class="radar-circle"></div>
+                <div class="radar-circle"></div>
+                <div class="radar-circle"></div>
+                <div class="radar-line"></div>
+            </div>
 
-  <!-- Result Section -->
-  <div id="result" class="hidden mt-8">
-    <button 
-      onclick="window.location.href='/dashboard'" 
-      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl text-xl transition transform hover:scale-110 animate-pulse-glow">
-      🚀 Go to Dashboard
-    </button>
-  </div>
+            <div class="step-indicator">
+                <div class="step" id="step1"></div>
+                <div class="step" id="step2"></div>
+                <div class="step" id="step3"></div>
+                <div class="step" id="step4"></div>
+            </div>
 
-  <!-- Error Section -->
-  <div id="error-section" class="hidden mt-8 text-red-600 font-bold"></div>
+            <p class="status-text" id="status-text">Initializing scan...</p>
+            <p class="progress-text" id="progress-text">Please wait while we gather the latest vulnerability data</p>
 
-<script>
-  async function checkStatus() {
-    const res = await fetch("/status");
-    const data = await res.json();
-    if (data.download_ready) {   
-      document.getElementById("loading").style.display = "none";   // hide spinner
-      document.getElementById("result").classList.remove("hidden"); // show button
-    } else if (data.error) {
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("error-section").innerText = data.error;
-      document.getElementById("error-section").classList.remove("hidden");
-    } else {
-      setTimeout(checkStatus, 4000);
-    }
-  }
-  checkStatus();
-</script>
+            <div class="stats hidden" id="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Sources Scanned</div>
+                    <div class="stat-value" id="sources-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Vulnerabilities Found</div>
+                    <div class="stat-value" id="vulns-count">0</div>
+                </div>
+            </div>
+        </div>
 
+        <div id="complete-section" class="scanner-container hidden">
+            <h1>✅ Scan Complete!</h1>
+            <p style="font-size: 1.2em; margin: 20px 0;">Your vulnerability report is ready</p>
+            <a href="/dashboard" class="dashboard-btn">🚀 View Dashboard</a>
+        </div>
+
+        <div id="error-section" class="scanner-container hidden">
+            <h1>⚠️ Error Occurred</h1>
+            <div class="error-box">
+                <p id="error-message">An error occurred during scanning</p>
+            </div>
+            <a href="/" class="dashboard-btn" style="margin-top: 20px; background: #dc3545;">🔄 Try Again</a>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+
+        async function updateStatus() {
+            try {
+                const res = await fetch("/status");
+                const data = await res.json();
+
+                // Update progress indicators
+                if (data.current_step !== currentStep) {
+                    currentStep = data.current_step;
+                    updateSteps(currentStep);
+                }
+
+                // Update text
+                document.getElementById('status-text').textContent = 
+                    data.progress || 'Processing...';
+
+                // Show completion
+                if (data.download_ready) {
+                    document.getElementById('scanning-section').classList.add('hidden');
+                    document.getElementById('complete-section').classList.remove('hidden');
+                } 
+                // Show error
+                else if (data.error) {
+                    document.getElementById('scanning-section').classList.add('hidden');
+                    document.getElementById('error-section').classList.remove('hidden');
+                    document.getElementById('error-message').textContent = data.error;
+                } 
+                // Continue polling
+                else {
+                    setTimeout(updateStatus, 2000);
+                }
+            } catch (err) {
+                console.error('Status check failed:', err);
+                setTimeout(updateStatus, 3000);
+            }
+        }
+
+        function updateSteps(current) {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                
+                if (i < current) {
+                    step.classList.add('completed');
+                } else if (i === current) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        // Start status checking
+        updateStatus();
+    </script>
 </body>
 </html>

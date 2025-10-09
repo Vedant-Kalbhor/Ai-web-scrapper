@@ -2,71 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vulnerability Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background-color: #f0f2f5;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
             color: #333;
-            line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        h1 {
+        .header {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 2.5em;
-        }
-
-        #lastUpdated {
-            text-align: center;
-            color: #555;
-            margin-bottom: 30px;
-            font-size: 0.95em;
-        }
-
-        .download-button {
-            display: block;
-            width: fit-content;
-            margin: 0 auto 30px auto;
-            padding: 12px 25px;
-            background-color: #1abc9c;
             color: white;
-            border: none;
-            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
             font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0.9;
         }
 
-        .download-button:hover {
-            background-color: #16a085;
-            transform: translateY(-2px);
-        }
-
-        .charts-grid {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            transform: translateY(-3px);
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .card {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transition: transform 0.3s ease;
         }
 
@@ -75,202 +140,387 @@
         }
 
         .card h3 {
-            color: #34495e;
-            margin-top: 0;
+            color: #333;
             margin-bottom: 20px;
             font-size: 1.5em;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
+            font-weight: 600;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #e0e6ed;
-            padding: 12px 15px;
-            text-align: left;
             font-size: 0.95em;
         }
 
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
         th {
-            background-color: #ecf0f1;
-            color: #555;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .severity-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical { background: #dc3545; color: white; }
+        .severity-high { background: #fd7e14; color: white; }
+        .severity-medium { background: #ffc107; color: #333; }
+        .severity-low { background: #28a745; color: white; }
+        .severity-unknown { background: #6c757d; color: white; }
+
+        .insights-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+
+        .insights-box h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
             font-weight: 600;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9fbfd;
-        }
-
-        tr:hover {
-            background-color: #f1f4f8;
-        }
-
-        td a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        td a:hover {
-            color: #2980b9;
-            text-decoration: underline;
-        }
-
-        /* AI Insights styling */
-        .insights-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: #fdfdfd;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .insights-box h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
         .insights-content {
+            line-height: 1.8;
+            color: #555;
             white-space: pre-wrap;
-            font-size: 1em;
-            color: #444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .cvss-score {
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 5px;
+            background: #f0f0f0;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-data h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .charts-section { grid-template-columns: 1fr; }
+            .stat-card .value { font-size: 2em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔒 Vulnerability Dashboard</h1>
-        <p id="lastUpdated"></p>
-
-        <button onclick="window.location.href='/get_report'" class="download-button">
-            ⬇️ Download Report
-        </button>
-        <button onclick="window.location.href='/mitigation'" class="download-button">
-            🔎 Go to Mitigation Finder
-        </button>
-
-        <div class="charts-grid">
-            <div class="card">
-                <h3>Severity Distribution</h3>
-                <canvas id="severityChart"></canvas>
-            </div>
-            <div class="card">
-                <h3>CVEs Over Time</h3>
-                <canvas id="trendChart"></canvas>
-            </div>
+        <div class="header">
+            <h1>🛡️ Vulnerability Dashboard</h1>
+            <p class="subtitle" id="lastUpdated">Loading...</p>
         </div>
 
-        <div class="card">
-            <h3>Latest 10 CVEs</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>CVE ID</th>
-                        <th>Description</th>
-                        <th>Severity</th>
-                        <th>CVSS Score</th>
-                        <th>Vendor</th>
-                        <th>Product</th>
-                    </tr>
-                </thead>
-                <tbody id="cveTable"></tbody>
-            </table>
+        <div id="statsGrid" class="stats-grid"></div>
+
+        <div class="action-buttons">
+            <a href="/get_report" class="btn btn-primary">📥 Download Report</a>
+            <a href="/mitigation" class="btn btn-secondary">🔍 Mitigation Finder</a>
+            <a href="/" class="btn btn-secondary">🔄 New Scan</a>
         </div>
 
-        <!-- 🔹 AI Insights Section -->
-        <div class="insights-box">
-            <h3>🤖 AI Insights</h3>
-            <p id="insights-text">Loading AI analysis...</p>
-        </div>
+        <div id="chartsSection" class="charts-section"></div>
+
+        <div id="vulnTable" class="card"></div>
+
+        <div id="insightsBox" class="insights-box"></div>
     </div>
 
     <script>
-        async function loadData() {
-            const res = await fetch("/api/vulnerabilities");
-            const data = await res.json();
+        async function loadDashboard() {
+            try {
+                const res = await fetch("/api/vulnerabilities");
+                const data = await res.json();
 
-            const cves = data.vulnerabilities || [];
-            document.getElementById("lastUpdated").innerText = 
-                data.generated_at ? "Last Updated: " + data.generated_at : "";
+                if (data.error) {
+                    showNoData();
+                    return;
+                }
 
-            // --- Severity Distribution ---
-            const severityCounts = { HIGH: 0, MEDIUM: 0, LOW: 0, NONE: 0 };
-            cves.forEach(cve => {
-                const sev = (cve.severity || "NONE").toUpperCase();
+                const vulns = data.vulnerabilities || [];
+                
+                // Update header
+                document.getElementById("lastUpdated").innerText = 
+                    `Last Updated: ${data.generated_at || 'Unknown'} • ${data.total_vulnerabilities || vulns.length} Vulnerabilities from ${data.sources_scanned || 'multiple'} sources`;
+
+                // Render stats
+                renderStats(data, vulns);
+
+                // Render charts
+                renderCharts(vulns);
+
+                // Render table
+                renderTable(vulns);
+
+                // Load AI insights
+                loadInsights(data.ai_insights);
+
+            } catch (err) {
+                console.error(err);
+                showNoData();
+            }
+        }
+
+        function renderStats(data, vulns) {
+            const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, UNKNOWN: 0 };
+            vulns.forEach(v => {
+                const sev = (v.severity || 'UNKNOWN').toUpperCase();
                 severityCounts[sev] = (severityCounts[sev] || 0) + 1;
             });
 
-            new Chart(document.getElementById("severityChart"), {
-                type: "pie",
+            const critical = severityCounts.CRITICAL + severityCounts.HIGH;
+
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="icon">📊</div>
+                    <div class="value">${data.total_vulnerabilities || vulns.length}</div>
+                    <div class="label">Total Vulnerabilities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🔴</div>
+                    <div class="value">${critical}</div>
+                    <div class="label">Critical/High</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🟡</div>
+                    <div class="value">${severityCounts.MEDIUM}</div>
+                    <div class="label">Medium Risk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🌐</div>
+                    <div class="value">${data.sources_scanned || 'N/A'}</div>
+                    <div class="label">Sources Scanned</div>
+                </div>
+            `;
+            document.getElementById('statsGrid').innerHTML = statsHTML;
+        }
+
+        function renderCharts(vulns) {
+            const chartsHTML = `
+                <div class="card">
+                    <h3>📊 Severity Distribution</h3>
+                    <canvas id="severityChart"></canvas>
+                </div>
+                <div class="card">
+                    <h3>📈 Top Affected Products</h3>
+                    <canvas id="productsChart"></canvas>
+                </div>
+            `;
+            document.getElementById('chartsSection').innerHTML = chartsHTML;
+
+            // Severity Chart
+            const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, UNKNOWN: 0 };
+            vulns.forEach(v => {
+                const sev = (v.severity || 'UNKNOWN').toUpperCase();
+                severityCounts[sev] = (severityCounts[sev] || 0) + 1;
+            });
+
+            new Chart(document.getElementById('severityChart'), {
+                type: 'doughnut',
                 data: {
                     labels: Object.keys(severityCounts),
                     datasets: [{
                         data: Object.values(severityCounts),
-                        backgroundColor: ["#e74c3c", "#f39c12", "#2ecc71", "#bdc3c7"],
-                        hoverOffset: 10
+                        backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#6c757d'],
+                        borderWidth: 0
                     }]
                 },
-                options: { responsive: true }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                padding: 15,
+                                font: { size: 12, family: 'Inter' }
+                            }
+                        }
+                    }
+                }
             });
 
-            // --- CVEs Over Time ---
-            const dateCounts = {};
-            cves.forEach(cve => {
-                const date = cve.published?.split("T")[0] || "unknown";
-                dateCounts[date] = (dateCounts[date] || 0) + 1;
+            // Products Chart
+            const productCounts = {};
+            vulns.forEach(v => {
+                (v.affected_products || []).forEach(prod => {
+                    if (prod) {
+                        const name = prod.split(' ')[0].substring(0, 20);
+                        productCounts[name] = (productCounts[name] || 0) + 1;
+                    }
+                });
             });
 
-            const sortedDates = Object.keys(dateCounts).sort();
-            const sortedDateCounts = sortedDates.map(date => dateCounts[date]);
+            const sortedProducts = Object.entries(productCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
 
-            new Chart(document.getElementById("trendChart"), {
-                type: "line",
+            new Chart(document.getElementById('productsChart'), {
+                type: 'bar',
                 data: {
-                    labels: sortedDates,
+                    labels: sortedProducts.map(p => p[0]),
                     datasets: [{
-                        label: "CVEs Published",
-                        data: sortedDateCounts,
-                        borderColor: "#3498db",
-                        backgroundColor: "rgba(52, 152, 219, 0.2)",
-                        fill: true,
-                        tension: 0.3
+                        label: 'Vulnerabilities',
+                        data: sortedProducts.map(p => p[1]),
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2
                     }]
                 },
-                options: { responsive: true }
-            });
-
-            // --- Table ---
-            const table = document.getElementById("cveTable");
-            table.innerHTML = '';
-            cves.slice(0, 10).forEach(cve => {
-                const row = `<tr>
-                    <td><a href="https://nvd.nist.gov/vuln/detail/${cve.id}" target="_blank">${cve.id}</a></td>
-                    <td>${(cve.description || "No description provided").slice(0, 100)}...</td>
-                    <td>${cve.severity || "N/A"}</td>
-                    <td>${cve.cvss_score || "N/A"}</td>
-                    <td>${cve.vendor || "N/A"}</td>
-                    <td>${cve.product || "N/A"}</td>
-                </tr>`;
-                table.innerHTML += row;
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true,
+                            ticks: { font: { family: 'Inter' } }
+                        },
+                        y: {
+                            ticks: { font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
             });
         }
 
-        async function loadAIInsights() {
-            try {
-                const res = await fetch("/ai_insights");
-                const data = await res.json();
-                document.getElementById("insights-text").innerText =
-                    data.insights || "⚠️ Could not load insights.";
-            } catch (err) {
-                document.getElementById("insights-text").innerText = "⚠️ Error loading AI insights.";
+        function renderTable(vulns) {
+            let tableHTML = `
+                <h3>🔍 Vulnerability Details</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Severity</th>
+                                <th>CVSS</th>
+                                <th>Affected Products</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            vulns.forEach(v => {
+                const severity = (v.severity || 'UNKNOWN').toUpperCase();
+                const products = (v.affected_products || []).slice(0, 2).join(', ') || 'N/A';
+                const moreProducts = v.affected_products && v.affected_products.length > 2 ? 
+                    ` +${v.affected_products.length - 2} more` : '';
+                
+                tableHTML += `
+                    <tr>
+                        <td><strong>${v.id || 'N/A'}</strong></td>
+                        <td>${(v.title || 'No title').substring(0, 60)}${v.title && v.title.length > 60 ? '...' : ''}</td>
+                        <td><span class="severity-badge severity-${severity.toLowerCase()}">${severity}</span></td>
+                        <td>${v.cvss_score ? `<span class="cvss-score">${v.cvss_score}</span>` : 'N/A'}</td>
+                        <td>${products}${moreProducts}</td>
+                        <td><a href="${v.source}" target="_blank" style="color: #667eea;">View</a></td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('vulnTable').innerHTML = tableHTML;
+        }
+
+        function loadInsights(insights) {
+            const box = document.getElementById('insightsBox');
+            
+            if (insights) {
+                box.innerHTML = `
+                    <h3>🤖 AI Security Insights</h3>
+                    <div class="insights-content">${insights}</div>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3>🤖 AI Security Insights</h3>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Generating insights...</p>
+                    </div>
+                `;
             }
         }
 
-        loadData();
-        loadAIInsights();
+        function showNoData() {
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="no-data" style="grid-column: 1/-1;">
+                    <h2>📭 No Data Available</h2>
+                    <p>Please run a vulnerability scan first.</p>
+                    <a href="/" class="btn btn-primary" style="margin-top: 20px;">Start Scan</a>
+                </div>
+            `;
+        }
+
+        loadDashboard();
     </script>
 </body>
 </html>

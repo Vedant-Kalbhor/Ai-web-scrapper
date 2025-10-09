@@ -1,43 +1,74 @@
-import re
-from nvd import enrich_cve
+from datetime import datetime
 
-def extract_cves(text):
-    """
-    Extract CVE IDs (e.g., CVE-2025-12345) from text.
-    """
-    return re.findall(r"CVE-\d{4}-\d{4,7}", text)
 
-def generate_report(results):
+def generate_report(vulnerabilities):
     """
-    Generate vulnerability report with NVD enrichment.
+    Generate a formatted text report from vulnerability data.
     """
     report_file = "vulnerability_report.txt"
-
+    
     with open(report_file, "w", encoding="utf-8") as f:
-        f.write("🔒 Vulnerability Report\n")
-        f.write("="*50 + "\n\n")
+        # Header
+        f.write("=" * 80 + "\n")
+        f.write("🔒 VULNERABILITY SECURITY REPORT\n")
+        f.write("=" * 80 + "\n\n")
+        f.write(f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
+        f.write(f"Total Vulnerabilities: {len(vulnerabilities)}\n")
+        f.write("=" * 80 + "\n\n")
 
-        for item in results:
-            f.write("Raw Extract:\n")
-            f.write(item + "\n\n")
+        # Summary Statistics
+        severity_counts = {}
+        for vuln in vulnerabilities:
+            severity = vuln.get("severity", "UNKNOWN").upper()
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
 
-            # Check for CVEs inside the parsed text
-            cves = extract_cves(item)
-            if cves:
-                f.write("Enriched Data from NVD:\n")
-                for cve in cves:
-                    cve_data = enrich_cve(cve)
-                    if "error" in cve_data:
-                        f.write(f"- {cve}: {cve_data['error']}\n")
-                    else:
-                        f.write(f"- {cve}\n")
-                        f.write(f"  Description: {cve_data['description']}\n")
-                        f.write(f"  Severity: {cve_data.get('severity', 'N/A')}\n")
-                        f.write(f"  CVSS Score: {cve_data.get('cvss_score', 'N/A')}\n")
-                        f.write("  References:\n")
-                        for ref in cve_data.get("references", []):
-                            f.write(f"    - {ref}\n")
-                    f.write("\n")
-            f.write("-"*50 + "\n\n")
+        f.write("📊 SEVERITY BREAKDOWN\n")
+        f.write("-" * 80 + "\n")
+        for severity in ["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"]:
+            count = severity_counts.get(severity, 0)
+            if count > 0:
+                emoji = {"CRITICAL": "🔴", "HIGH": "🟠", "MEDIUM": "🟡", "LOW": "🟢", "UNKNOWN": "⚪"}
+                f.write(f"{emoji.get(severity, '⚪')} {severity}: {count}\n")
+        f.write("\n" + "=" * 80 + "\n\n")
+
+        # Detailed Vulnerability List
+        f.write("📋 DETAILED VULNERABILITY INFORMATION\n")
+        f.write("=" * 80 + "\n\n")
+
+        for idx, vuln in enumerate(vulnerabilities, 1):
+            f.write(f"[{idx}] {vuln.get('id', 'UNKNOWN')}\n")
+            f.write("-" * 80 + "\n")
+            
+            f.write(f"Title: {vuln.get('title', 'No title')}\n\n")
+            
+            f.write(f"Severity: {vuln.get('severity', 'UNKNOWN')}")
+            if vuln.get('cvss_score'):
+                f.write(f" (CVSS: {vuln.get('cvss_score')})")
+            f.write("\n\n")
+            
+            f.write("Description:\n")
+            f.write(f"{vuln.get('description', 'No description available')}\n\n")
+            
+            if vuln.get('affected_products'):
+                f.write("Affected Products:\n")
+                for product in vuln.get('affected_products', []):
+                    f.write(f"  • {product}\n")
+                f.write("\n")
+            
+            f.write("Solution/Mitigation:\n")
+            f.write(f"{vuln.get('solution', 'Check vendor advisory')}\n\n")
+            
+            if vuln.get('published_date'):
+                f.write(f"Published: {vuln.get('published_date')}\n")
+            
+            f.write(f"Source: {vuln.get('source', 'Unknown')}\n")
+            
+            f.write("\n" + "=" * 80 + "\n\n")
+
+        # Footer
+        f.write("END OF REPORT\n")
+        f.write("=" * 80 + "\n")
+        f.write("\n⚠️  DISCLAIMER: This report is generated from publicly available sources.\n")
+        f.write("Always verify vulnerabilities through official vendor advisories.\n")
 
     return report_file
