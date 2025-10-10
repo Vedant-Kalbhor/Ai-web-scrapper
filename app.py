@@ -24,7 +24,7 @@ report_status = {
 
 
 def generate_report_task():
-    """Optimized report generation - scraping only"""
+    """Optimized report generation - parallel scraping"""
     try:
         print("🚀 Starting vulnerability scan...")
         report_status["is_generating"] = True
@@ -37,34 +37,17 @@ def generate_report_task():
             if os.path.exists(file):
                 os.remove(file)
 
-        # Step 1: Get URLs
+        # Step 1: Initialize
         report_status["current_step"] = 1
-        report_status["progress"] = "Fetching vulnerability sources..."
-        urls = get_vulnerability_urls()
-        print(f"📋 Found {len(urls)} sources to scrape")
+        report_status["progress"] = "Initializing parallel scraping..."
+        print(f"📋 Preparing to scrape sources...")
 
-        # Step 2: Scrape all sources
+        # Step 2: Parallel scraping (MUCH FASTER!)
         report_status["current_step"] = 2
-        report_status["progress"] = "Scraping vulnerability data..."
-        scraped_data = []
+        report_status["progress"] = "Scraping all sources in parallel..."
         
-        for idx, url in enumerate(urls):
-            try:
-                print(f"🌐 Scraping {url}...")
-                report_status["progress"] = f"Scraping source {idx + 1}/{len(urls)}..."
-                
-                raw_text = scrape_content(url)
-                if raw_text and len(raw_text.strip()) > 100:
-                    scraped_data.append({
-                        "source": url,
-                        "content": raw_text
-                    })
-                    print(f"✅ Successfully scraped {url}")
-                else:
-                    print(f"⚠️ Empty or insufficient data from {url}")
-                    
-            except Exception as e:
-                print(f"❌ Error scraping {url}: {e}")
+        from scrape import scrape_all_parallel
+        scraped_data = scrape_all_parallel(max_workers=3)
 
         if not scraped_data:
             raise Exception("No vulnerability data could be scraped from any source")
@@ -217,4 +200,3 @@ def api_mitigation():
 
 if __name__ == '__main__':
     app.run(debug=False, use_reloader=False)
-
