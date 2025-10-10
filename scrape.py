@@ -88,3 +88,4 @@ def scrape_with_retry(url, max_retries=2):
                 time.sleep(3)
             else:
                 raise e
+            

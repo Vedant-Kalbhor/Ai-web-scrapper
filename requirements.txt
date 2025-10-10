@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 flask
 langchain
 langchain_google_genai
@@ -8,14 +7,3 @@ lxml
 html5lib
 python-dotenv
 webdriver-manager
-=======
-flask==3.0.0
-selenium==4.15.2
-webdriver-manager
-beautifulsoup4
-langchain-google-genai
-langchain
-python-dotenv
-requests
-lxml
->>>>>>> 5d6b5fa (Claude changes)
