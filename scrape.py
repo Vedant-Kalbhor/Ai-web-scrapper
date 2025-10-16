@@ -6,7 +6,8 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 def get_vulnerability_urls():
     """
@@ -63,44 +64,53 @@ def scrape_rss_feed(url):
 
 def scrape_json_api(url):
     """
-    Fast JSON API scraping using requests.
+    Fast JSON API scraping with retries and session reset.
     """
     try:
         print(f"  → Fetching JSON API: {url}")
-        response = requests.get(url, timeout=10, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        
+        # Create a new session each time to avoid stale connections
+        session = requests.Session()
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=2,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+
+        response = session.get(url, timeout=15, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
         })
         response.raise_for_status()
-        
         data = response.json()
-        
-        # Convert JSON to readable text format for AI parsing
-        # For CISA KEV, extract vulnerabilities array
+        session.close()  # Explicitly close session
+
         if 'vulnerabilities' in data:
             vulnerabilities = data['vulnerabilities']
             print(f"  ✓ Found {len(vulnerabilities)} vulnerabilities in JSON")
             
-            # Format nicely for AI
             text_lines = []
-            for vuln in vulnerabilities[:100]:  # Limit to 100 most recent
+            for vuln in vulnerabilities[:100]:
                 cve_id = vuln.get('cveID', 'Unknown')
                 title = vuln.get('vulnerabilityName', 'Unknown')
                 description = vuln.get('shortDescription', 'No description')
                 vendor = vuln.get('vendorProject', 'Unknown')
                 product = vuln.get('product', 'Unknown')
                 date = vuln.get('dateAdded', 'Unknown')
-                
-                text_lines.append(f"CVE: {cve_id}")
-                text_lines.append(f"Title: {title}")
-                text_lines.append(f"Description: {description}")
-                text_lines.append(f"Vendor: {vendor}")
-                text_lines.append(f"Product: {product}")
-                text_lines.append(f"Date: {date}")
-                text_lines.append("-" * 50)
-            
+                text_lines.extend([
+                    f"CVE: {cve_id}",
+                    f"Title: {title}",
+                    f"Description: {description}",
+                    f"Vendor: {vendor}",
+                    f"Product: {product}",
+                    f"Date: {date}",
+                    "-" * 50
+                ])
             text = "\n".join(text_lines)
         else:
-            # Generic JSON formatting
             import json
             text = json.dumps(data, indent=2)
         
@@ -110,7 +120,6 @@ def scrape_json_api(url):
     except Exception as e:
         print(f"  ✗ JSON API error: {e}")
         return ""
-
 
 def scrape_html_fast(url, timeout=8):
     """
@@ -206,26 +215,20 @@ def scrape_content(source_dict):
 
 
 def scrape_all_parallel(max_workers=3):
-    """
-    Scrape multiple sources in parallel for maximum speed.
-    """
     sources = get_vulnerability_urls()
     results = []
-    
+
     print(f"\n🚀 Starting parallel scraping of {len(sources)} sources...")
-    
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Submit all scraping tasks
         future_to_source = {
-            executor.submit(scrape_content, source): source 
-            for source in sources
+            executor.submit(scrape_content, source): source for source in sources
         }
-        
-        # Collect results as they complete
+
         for future in as_completed(future_to_source):
             source = future_to_source[future]
             try:
-                content = future.result()
+                content = future.result(timeout=30)
                 if content and len(content) > 100:
                     results.append({
                         "source": source.get("name", source.get("url")),
@@ -234,6 +237,9 @@ def scrape_all_parallel(max_workers=3):
                     })
             except Exception as e:
                 print(f"  ✗ Error processing {source.get('name')}: {e}")
-    
+
     print(f"\n✅ Parallel scraping complete: {len(results)} sources successful")
+    
+    # 🧼 Explicitly clean up thread pool resources
+    executor.shutdown(wait=True, cancel_futures=True)
     return results

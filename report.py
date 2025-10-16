@@ -72,3 +72,5 @@ def generate_report(vulnerabilities):
         f.write("Always verify vulnerabilities through official vendor advisories.\n")
 
     return report_file
+
+
