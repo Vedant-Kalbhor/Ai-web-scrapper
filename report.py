@@ -10,7 +10,7 @@ def generate_report(vulnerabilities):
     with open(report_file, "w", encoding="utf-8") as f:
         # Header
         f.write("=" * 80 + "\n")
-        f.write("🔒 VULNERABILITY SECURITY REPORT\n")
+        f.write("VULNERABILITY SECURITY REPORT\n")
         f.write("=" * 80 + "\n\n")
         f.write(f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
         f.write(f"Total Vulnerabilities: {len(vulnerabilities)}\n")

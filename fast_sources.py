@@ -10,21 +10,21 @@ ULTRA_FAST_SOURCES = [
         "type": "json",
         "name": "CISA KEV (JSON API)",
         "description": "Direct JSON feed, no scraping needed",
-        "speed": "⚡ Instant (< 2s)"
+        "speed": " Instant (< 2s)"
     },
     {
         "url": "https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml",
         "type": "rss",
         "name": "NVD RSS Feed",
         "description": "XML feed with latest CVEs",
-        "speed": "⚡ Very Fast (< 3s)"
+        "speed": " Very Fast (< 3s)"
     },
     {
         "url": "https://cve.mitre.org/data/downloads/allitems.csv",
         "type": "csv",
         "name": "CVE MITRE CSV",
         "description": "Complete CVE database in CSV",
-        "speed": "⚡ Fast (< 5s)"
+        "speed": " Fast (< 5s)"
     }
 ]
 
@@ -35,14 +35,14 @@ FAST_SOURCES = [
         "type": "json",
         "name": "OpenCVE API",
         "description": "Recent CVEs via REST API",
-        "speed": "🚀 Fast (< 4s)"
+        "speed": " Fast (< 4s)"
     },
     {
         "url": "https://www.exploit-db.com/",
         "type": "html",
         "name": "Exploit-DB",
         "description": "Exploit database",
-        "speed": "⚡ Medium (5-8s)"
+        "speed": " Medium (5-8s)"
     }
 ]
 
@@ -53,14 +53,14 @@ MODERATE_SOURCES = [
         "type": "html",
         "name": "NVD Recent Vulnerabilities",
         "description": "NVD website recent page",
-        "speed": "🕐 Moderate (8-12s)"
+        "speed": "Moderate (8-12s)"
     },
     {
         "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
         "type": "html",
         "name": "CISA KEV Catalog",
         "description": "CISA KEV web page",
-        "speed": "🕐 Moderate (10-15s)"
+        "speed": "Moderate (10-15s)"
     }
 ]
 
@@ -71,7 +71,7 @@ SLOW_SOURCES = [
         "type": "html",
         "name": "SecurityFocus",
         "description": "Requires heavy JS rendering",
-        "speed": "🐌 Slow (15-20s)"
+        "speed": "Slow (15-20s)"
     }
 ]
 
@@ -129,8 +129,8 @@ OPTIMIZATION_NOTES = """
 
 CURRENT SETUP:
 - Sequential scraping: 30-60 seconds
-- Parallel scraping (3 workers): 10-20 seconds ✅
-- Ultra-fast sources only: 5-10 seconds ⚡
+- Parallel scraping (3 workers): 10-20 seconds 
+- Ultra-fast sources only: 5-10 seconds 
 
 RECOMMENDED: Use get_recommended_sources() for production
 """

@@ -19,11 +19,10 @@ def get_vulnerability_urls():
     Optimized for parallel scraping.
     """
     return [
-        # --- Core Feeds (already included) ---
+
         {"url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", "type": "json", "name": "CISA KEV JSON"},
         {"url": "https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml", "type": "rss", "name": "NVD RSS Feed"},
 
-        # --- Additional Global Databases ---
         {"url": "https://cve.mitre.org/data/downloads/allitems.html", "type": "html", "name": "MITRE CVE Database"},
         {"url": "https://www.exploit-db.com/", "type": "html", "name": "Exploit Database (Exploit-DB)"},
         {"url": "https://www.kb.cert.org/vuls/", "type": "html", "name": "CERT/CC Vulnerability Notes"},
@@ -148,7 +147,7 @@ def scrape_html_fast(url, timeout=10):
 def scrape_content(source_dict):
     """Decide which scraper to use based on type."""
     url, typ, name = source_dict.get("url"), source_dict.get("type"), source_dict.get("name")
-    print(f"\n🌐 Scraping: {name}")
+    print(f"\n Scraping: {name}")
     try:
         if typ == "rss":
             return scrape_rss_feed(url)
@@ -168,7 +167,7 @@ def scrape_all_parallel(max_workers=6):
     sources = get_vulnerability_urls()
     results = []
 
-    print(f"\n🚀 Starting parallel scraping of {len(sources)} sources...")
+    print(f"\n Starting parallel scraping of {len(sources)} sources...")
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_source = {
@@ -199,15 +198,15 @@ def scrape_all_parallel(max_workers=6):
 
     # Verify structure
     if not results or not all("content" in r for r in results):
-        print("⚠️ Some sources missing 'content' key; parsing will fail.")
+        print("Some sources missing 'content' key; parsing will fail.")
     else:
-        print("🧩 All sources properly structured with 'content' key.")
+        print("All sources properly structured with 'content' key.")
     
     return results
 
     sources = get_vulnerability_urls()
     results = []
-    print(f"\n🚀 Starting parallel scraping of {len(sources)} sources...\n")
+    print(f"\n Starting parallel scraping of {len(sources)} sources...\n")
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_source = {executor.submit(scrape_content, src): src for src in sources}
@@ -221,11 +220,11 @@ def scrape_all_parallel(max_workers=6):
                         "url": src["url"],
                         "content_length": len(content)
                     })
-                    print(f"✅ {src['name']} done.")
+                    print(f" {src['name']} done.")
             except Exception as e:
                 print(f"  ✗ Error processing {src['name']}: {e}")
 
-    print(f"\n✅ Completed scraping {len(results)} / {len(sources)} sources.")
+    print(f"\n Completed scraping {len(results)} / {len(sources)} sources.")
     return results
 
 

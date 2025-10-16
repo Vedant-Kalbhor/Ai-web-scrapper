@@ -26,7 +26,7 @@ report_status = {
 def generate_report_task():
     """Optimized report generation - parallel scraping"""
     try:
-        print("🚀 Starting vulnerability scan...")
+        print(" Starting vulnerability scan...")
         report_status["is_generating"] = True
         report_status["error"] = None
         report_status["download_ready"] = False
@@ -40,7 +40,7 @@ def generate_report_task():
         # Step 1: Initialize
         report_status["current_step"] = 1
         report_status["progress"] = "Initializing parallel scraping..."
-        print(f"📋 Preparing to scrape sources...")
+        print(f"Preparing to scrape sources...")
 
         # Step 2: Parallel scraping (MUCH FASTER!)
         report_status["current_step"] = 2
@@ -65,7 +65,7 @@ def generate_report_task():
                 )
                 all_vulnerabilities.extend(vulnerabilities)
             except Exception as e:
-                print(f"⚠️ Error parsing {item['source']}: {e}")
+                print(f" Error parsing {item['source']}: {e}")
 
         # Remove duplicates based on CVE ID
         seen_cves = set()
@@ -82,7 +82,7 @@ def generate_report_task():
         severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "UNKNOWN": 4}
         unique_vulns.sort(key=lambda x: severity_order.get(x.get("severity", "UNKNOWN").upper(), 5))
 
-        print(f"📊 Found {len(unique_vulns)} unique vulnerabilities")
+        print(f" Found {len(unique_vulns)} unique vulnerabilities")
 
         # Step 4: Generate Reports
         report_status["current_step"] = 4
@@ -90,7 +90,7 @@ def generate_report_task():
 
         # Generate text report
         generate_report(unique_vulns)
-        print("📝 Text report created")
+        print("Text report created")
 
         # Generate JSON for dashboard
         dashboard_data = {
@@ -102,7 +102,7 @@ def generate_report_task():
 
         with open(JSON_FILE, "w", encoding="utf-8") as f:
             json.dump(dashboard_data, f, indent=2)
-        print("📊 JSON dashboard data created")
+        print("JSON dashboard data created")
 
         # Generate AI insights
         try:
@@ -111,16 +111,16 @@ def generate_report_task():
             
             with open(JSON_FILE, "w", encoding="utf-8") as f:
                 json.dump(dashboard_data, f, indent=2)
-            print("🤖 AI insights added")
+            print("AI insights added")
         except Exception as e:
-            print(f"⚠️ Could not generate AI insights: {e}")
+            print(f" Could not generate AI insights: {e}")
 
         report_status["download_ready"] = True
-        report_status["progress"] = "Scan complete! ✅"
-        print("✅ Report generation complete")
+        report_status["progress"] = "Scan complete!"
+        print(" Report generation complete")
 
     except Exception as e:
-        print("❌ Error in report task:", e)
+        print(" Error in report task:", e)
         traceback.print_exc()
         report_status["error"] = str(e)
         report_status["progress"] = "Error occurred"
@@ -136,11 +136,11 @@ def index():
 @app.route('/scan', methods=['POST'])
 def scan():
     if not report_status["is_generating"]:
-        print("🔄 Starting new vulnerability scan...")
+        print(" Starting new vulnerability scan...")
         thread = threading.Thread(target=generate_report_task, daemon=True)
         thread.start()
     else:
-        print("⚠️ Scan already in progress")
+        print(" Scan already in progress")
     return redirect(url_for("scanning"))
 
 

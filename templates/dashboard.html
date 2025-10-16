@@ -267,16 +267,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛡️ Vulnerability Dashboard</h1>
+            <h1>Vulnerability Dashboard</h1>
             <p class="subtitle" id="lastUpdated">Loading...</p>
         </div>
 
         <div id="statsGrid" class="stats-grid"></div>
 
         <div class="action-buttons">
-            <a href="/get_report" class="btn btn-primary">📥 Download Report</a>
-            <a href="/mitigation" class="btn btn-secondary">🔍 Mitigation Finder</a>
-            <a href="/" class="btn btn-secondary">🔄 New Scan</a>
+            <a href="/get_report" class="btn btn-primary"> Download Report</a>
+            <a href="/mitigation" class="btn btn-secondary"> Mitigation Finder</a>
+            <a href="/" class="btn btn-secondary"> New Scan</a>
         </div>
 
         <div id="chartsSection" class="charts-section"></div>
@@ -332,7 +332,6 @@
 
             const statsHTML = `
                 <div class="stat-card">
-                    <div class="icon">📊</div>
                     <div class="value">${data.total_vulnerabilities || vulns.length}</div>
                     <div class="label">Total Vulnerabilities</div>
                 </div>
@@ -347,7 +346,7 @@
                     <div class="label">Medium Risk</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">🌐</div>
+                    
                     <div class="value">${data.sources_scanned || 'N/A'}</div>
                     <div class="label">Sources Scanned</div>
                 </div>
@@ -358,11 +357,11 @@
         function renderCharts(vulns) {
             const chartsHTML = `
                 <div class="card">
-                    <h3>📊 Severity Distribution</h3>
+                    <h3> Severity Distribution</h3>
                     <canvas id="severityChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>📈 Top Affected Products</h3>
+                    <h3> Top Affected Products</h3>
                     <canvas id="productsChart"></canvas>
                 </div>
             `;
@@ -448,7 +447,7 @@
 
         function renderTable(vulns) {
             let tableHTML = `
-                <h3>🔍 Vulnerability Details</h3>
+                <h3> Vulnerability Details</h3>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -496,12 +495,12 @@
             
             if (insights) {
                 box.innerHTML = `
-                    <h3>🤖 AI Security Insights</h3>
+                    <h3> AI Security Insights</h3>
                     <div class="insights-content">${insights}</div>
                 `;
             } else {
                 box.innerHTML = `
-                    <h3>🤖 AI Security Insights</h3>
+                    <h3> AI Security Insights</h3>
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>Generating insights...</p>
@@ -513,7 +512,7 @@
         function showNoData() {
             document.getElementById('statsGrid').innerHTML = `
                 <div class="no-data" style="grid-column: 1/-1;">
-                    <h2>📭 No Data Available</h2>
+                    <h2> No Data Available</h2>
                     <p>Please run a vulnerability scan first.</p>
                     <a href="/" class="btn btn-primary" style="margin-top: 20px;">Start Scan</a>
                 </div>
