@@ -40,6 +40,109 @@
             opacity: 0.9;
         }
 
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .clear-btn {
+            padding: 15px 25px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #5a6268;
+        }
+
+        .search-examples {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-examples span {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .example-tag {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-results-info {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .search-results-info.active {
+            display: block;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -261,22 +364,50 @@
             .header h1 { font-size: 2em; }
             .charts-section { grid-template-columns: 1fr; }
             .stat-card .value { font-size: 2em; }
+            .search-box { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛡️ Vulnerability Dashboard</h1>
+            <h1>[#] Vulnerability Dashboard</h1>
             <p class="subtitle" id="lastUpdated">Loading...</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search by software, company, CVE ID, or product name..."
+                    onkeypress="if(event.key==='Enter') searchVulnerabilities()"
+                >
+                <button class="search-btn" onclick="searchVulnerabilities()">[>] Search</button>
+                <button class="clear-btn" onclick="clearSearch()" id="clearBtn" style="display: none;">[x] Clear</button>
+            </div>
+            <div class="search-examples">
+                <span>Examples:</span>
+                <div class="example-tag" onclick="quickSearch('apache')">Apache</div>
+                <div class="example-tag" onclick="quickSearch('microsoft')">Microsoft</div>
+                <div class="example-tag" onclick="quickSearch('CVE-2025')">CVE-2025</div>
+                <div class="example-tag" onclick="quickSearch('linux')">Linux</div>
+                <div class="example-tag" onclick="quickSearch('java')">Java</div>
+            </div>
+        </div>
+
+        <div class="search-results-info" id="searchResultsInfo">
+            <strong id="searchResultsText"></strong>
         </div>
 
         <div id="statsGrid" class="stats-grid"></div>
 
         <div class="action-buttons">
-            <a href="/get_report" class="btn btn-primary">📥 Download Report</a>
-            <a href="/mitigation" class="btn btn-secondary">🔍 Mitigation Finder</a>
-            <a href="/" class="btn btn-secondary">🔄 New Scan</a>
+            <a href="/get_report" class="btn btn-primary">[v] Download Report</a>
+            <a href="/mitigation" class="btn btn-secondary">[?] Mitigation Finder</a>
+            <a href="/" class="btn btn-secondary">[+] New Scan</a>
         </div>
 
         <div id="chartsSection" class="charts-section"></div>
@@ -287,6 +418,10 @@
     </div>
 
     <script>
+        let allVulnerabilities = [];
+        let currentDisplayData = [];
+        let isSearchActive = false;
+
         async function loadDashboard() {
             try {
                 const res = await fetch("/api/vulnerabilities");
@@ -297,20 +432,15 @@
                     return;
                 }
 
-                const vulns = data.vulnerabilities || [];
+                allVulnerabilities = data.vulnerabilities || [];
+                currentDisplayData = allVulnerabilities;
                 
                 // Update header
                 document.getElementById("lastUpdated").innerText = 
-                    `Last Updated: ${data.generated_at || 'Unknown'} • ${data.total_vulnerabilities || vulns.length} Vulnerabilities from ${data.sources_scanned || 'multiple'} sources`;
+                    `Last Updated: ${data.generated_at || 'Unknown'} | ${data.total_vulnerabilities || allVulnerabilities.length} Vulnerabilities from ${data.sources_scanned || 'multiple'} sources`;
 
-                // Render stats
-                renderStats(data, vulns);
-
-                // Render charts
-                renderCharts(vulns);
-
-                // Render table
-                renderTable(vulns);
+                // Render dashboard
+                renderDashboard(data, currentDisplayData);
 
                 // Load AI insights
                 loadInsights(data.ai_insights);
@@ -319,6 +449,12 @@
                 console.error(err);
                 showNoData();
             }
+        }
+
+        function renderDashboard(data, vulns) {
+            renderStats(data, vulns);
+            renderCharts(vulns);
+            renderTable(vulns);
         }
 
         function renderStats(data, vulns) {
@@ -332,22 +468,22 @@
 
             const statsHTML = `
                 <div class="stat-card">
-                    <div class="icon">📊</div>
-                    <div class="value">${data.total_vulnerabilities || vulns.length}</div>
-                    <div class="label">Total Vulnerabilities</div>
+                    <div class="icon">[#]</div>
+                    <div class="value">${vulns.length}</div>
+                    <div class="label">${isSearchActive ? 'Matching Results' : 'Total Vulnerabilities'}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">🔴</div>
+                    <div class="icon">[!]</div>
                     <div class="value">${critical}</div>
                     <div class="label">Critical/High</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">🟡</div>
+                    <div class="icon">[~]</div>
                     <div class="value">${severityCounts.MEDIUM}</div>
                     <div class="label">Medium Risk</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">🌐</div>
+                    <div class="icon">[*]</div>
                     <div class="value">${data.sources_scanned || 'N/A'}</div>
                     <div class="label">Sources Scanned</div>
                 </div>
@@ -358,15 +494,19 @@
         function renderCharts(vulns) {
             const chartsHTML = `
                 <div class="card">
-                    <h3>📊 Severity Distribution</h3>
+                    <h3>[%] Severity Distribution</h3>
                     <canvas id="severityChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>📈 Top Affected Products</h3>
+                    <h3>[^] Top Affected Products</h3>
                     <canvas id="productsChart"></canvas>
                 </div>
             `;
             document.getElementById('chartsSection').innerHTML = chartsHTML;
+
+            // Destroy existing charts if they exist
+            if (window.severityChartInstance) window.severityChartInstance.destroy();
+            if (window.productsChartInstance) window.productsChartInstance.destroy();
 
             // Severity Chart
             const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, UNKNOWN: 0 };
@@ -375,7 +515,7 @@
                 severityCounts[sev] = (severityCounts[sev] || 0) + 1;
             });
 
-            new Chart(document.getElementById('severityChart'), {
+            window.severityChartInstance = new Chart(document.getElementById('severityChart'), {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(severityCounts),
@@ -415,7 +555,7 @@
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 10);
 
-            new Chart(document.getElementById('productsChart'), {
+            window.productsChartInstance = new Chart(document.getElementById('productsChart'), {
                 type: 'bar',
                 data: {
                     labels: sortedProducts.map(p => p[0]),
@@ -448,7 +588,7 @@
 
         function renderTable(vulns) {
             let tableHTML = `
-                <h3>🔍 Vulnerability Details</h3>
+                <h3>[=] Vulnerability Details</h3>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -458,29 +598,38 @@
                                 <th>Severity</th>
                                 <th>CVSS</th>
                                 <th>Affected Products</th>
-                                <th>Source</th>
                             </tr>
                         </thead>
                         <tbody>
             `;
 
-            vulns.forEach(v => {
-                const severity = (v.severity || 'UNKNOWN').toUpperCase();
-                const products = (v.affected_products || []).slice(0, 2).join(', ') || 'N/A';
-                const moreProducts = v.affected_products && v.affected_products.length > 2 ? 
-                    ` +${v.affected_products.length - 2} more` : '';
-                
+            if (vulns.length === 0) {
                 tableHTML += `
                     <tr>
-                        <td><strong>${v.id || 'N/A'}</strong></td>
-                        <td>${(v.title || 'No title').substring(0, 60)}${v.title && v.title.length > 60 ? '...' : ''}</td>
-                        <td><span class="severity-badge severity-${severity.toLowerCase()}">${severity}</span></td>
-                        <td>${v.cvss_score ? `<span class="cvss-score">${v.cvss_score}</span>` : 'N/A'}</td>
-                        <td>${products}${moreProducts}</td>
-                        <td><a href="${v.source}" target="_blank" style="color: #667eea;">View</a></td>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            No vulnerabilities found matching your search criteria.
+                        </td>
                     </tr>
                 `;
-            });
+            } else {
+                vulns.forEach(v => {
+                    const severity = (v.severity || 'UNKNOWN').toUpperCase();
+                    const products = (v.affected_products || []).slice(0, 2).join(', ') || 'N/A';
+                    const moreProducts = v.affected_products && v.affected_products.length > 2 ? 
+                        ` +${v.affected_products.length - 2} more` : '';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td><strong>${v.id || 'N/A'}</strong></td>
+                            <td>${(v.title || 'No title').substring(0, 60)}${v.title && v.title.length > 60 ? '...' : ''}</td>
+                            <td><span class="severity-badge severity-${severity.toLowerCase()}">${severity}</span></td>
+                            <td>${v.cvss_score ? `<span class="cvss-score">${v.cvss_score}</span>` : 'N/A'}</td>
+                            <td>${products}${moreProducts}</td>
+                            <td><a href="${v.source}" target="_blank" style="color: #667eea;">View</a></td>
+                        </tr>
+                    `;
+                });
+            }
 
             tableHTML += `
                         </tbody>
@@ -496,12 +645,12 @@
             
             if (insights) {
                 box.innerHTML = `
-                    <h3>🤖 AI Security Insights</h3>
+                    <h3>[i] AI Security Insights</h3>
                     <div class="insights-content">${insights}</div>
                 `;
             } else {
                 box.innerHTML = `
-                    <h3>🤖 AI Security Insights</h3>
+                    <h3>[i] AI Security Insights</h3>
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>Generating insights...</p>
@@ -510,16 +659,87 @@
             }
         }
 
+        async function searchVulnerabilities() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                isSearchActive = true;
+                currentDisplayData = data.vulnerabilities;
+
+                // Show search results info
+                const resultsInfo = document.getElementById('searchResultsInfo');
+                const resultsText = document.getElementById('searchResultsText');
+                resultsText.textContent = `Found ${data.total_results} result(s) for "${data.query}"`;
+                resultsInfo.classList.add('active');
+
+                // Show clear button
+                document.getElementById('clearBtn').style.display = 'inline-block';
+
+                // Re-render dashboard with filtered data
+                const fullData = {
+                    total_vulnerabilities: data.total_results,
+                    sources_scanned: 'Filtered',
+                    vulnerabilities: data.vulnerabilities
+                };
+                renderDashboard(fullData, currentDisplayData);
+
+            } catch (err) {
+                console.error('Search error:', err);
+                alert('Search failed. Please try again.');
+            }
+        }
+
+        function clearSearch() {
+            isSearchActive = false;
+            currentDisplayData = allVulnerabilities;
+            
+            // Clear input
+            document.getElementById('searchInput').value = '';
+            
+            // Hide search results info
+            document.getElementById('searchResultsInfo').classList.remove('active');
+            
+            // Hide clear button
+            document.getElementById('clearBtn').style.display = 'none';
+
+            // Re-render dashboard with all data
+            const fullData = {
+                total_vulnerabilities: allVulnerabilities.length,
+                sources_scanned: 'All',
+                vulnerabilities: allVulnerabilities
+            };
+            renderDashboard(fullData, currentDisplayData);
+        }
+
+        function quickSearch(term) {
+            document.getElementById('searchInput').value = term;
+            searchVulnerabilities();
+        }
+
         function showNoData() {
             document.getElementById('statsGrid').innerHTML = `
                 <div class="no-data" style="grid-column: 1/-1;">
-                    <h2>📭 No Data Available</h2>
+                    <h2>[x] No Data Available</h2>
                     <p>Please run a vulnerability scan first.</p>
                     <a href="/" class="btn btn-primary" style="margin-top: 20px;">Start Scan</a>
                 </div>
             `;
         }
 
+        // Load dashboard on page load
         loadDashboard();
     </script>
 </body>
