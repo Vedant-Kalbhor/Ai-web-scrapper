@@ -359,7 +359,16 @@
             font-size: 2em;
             margin-bottom: 20px;
         }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15) !important;
+        }
 
+        .feature-card a:hover,
+        .feature-card button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
         @media (max-width: 768px) {
             .header h1 { font-size: 2em; }
             .charts-section { grid-template-columns: 1fr; }

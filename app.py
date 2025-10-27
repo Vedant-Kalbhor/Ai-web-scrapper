@@ -7,6 +7,7 @@ from parse import parse_vulnerabilities_with_ai, generate_ai_insights
 from report import generate_report
 import json
 from datetime import datetime
+from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
 
 app = Flask(__name__)
 
@@ -346,6 +347,70 @@ def api_mitigation():
     except Exception as e:
         return jsonify({"error": f"Failed to get mitigation: {str(e)}"}), 500
 
+
+@app.route('/ai_search')
+def ai_search_page():
+    """AI-powered vulnerability search page"""
+    return render_template('ai_search.html')
+
+
+@app.route('/api/ai_search', methods=['POST'])
+def api_ai_search():
+    """
+    API endpoint for AI-powered vulnerability search
+    Uses Gemini's web search to find recent vulnerabilities
+    """
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    
+    if not query:
+        return jsonify({
+            "success": False,
+            "error": "Please provide a software or organization name"
+        }), 400
+    
+    print(f"[*] Searching vulnerabilities for: {query}")
+    
+    try:
+        # Use AI to search for vulnerabilities
+        result = search_vulnerabilities_with_ai(query)
+        print(f"[+] Found {result.get('total_found', 0)} vulnerabilities")
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"[!] Error in AI search: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Search failed: {str(e)}"
+        }), 500
+
+
+@app.route('/api/cve_details', methods=['POST'])
+def api_cve_details():
+    """
+    Get detailed information about a specific CVE
+    """
+    data = request.get_json()
+    cve_id = data.get('cve_id', '').strip()
+    
+    if not cve_id:
+        return jsonify({
+            "success": False,
+            "error": "Please provide a CVE ID"
+        }), 400
+    
+    print(f"[*] Fetching details for: {cve_id}")
+    
+    try:
+        result = search_vulnerability_details(cve_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"[!] Error fetching CVE details: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to fetch details: {str(e)}"
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=False, use_reloader=False)
