@@ -9,7 +9,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.0-flash",
     google_api_key=GOOGLE_API_KEY,
     temperature=0.3
 )
@@ -28,9 +28,11 @@ def parse_vulnerabilities_with_ai(text, source_url):
     other_lines = [line for line in lines if line not in cve_lines]
     
     # Combine: CVE lines first, then fill with other content
-    limited_lines = (cve_lines[:200] + other_lines[:300])[:400]
-    limited_text = "\n".join(limited_lines)
+    limited_lines = (cve_lines[:100] + other_lines[:100])[:200]
 
+    limited_text = "\n".join(limited_lines)
+    if len(limited_text) > 100000:
+        limited_text = limited_text[:100000]
     prompt = f"""You are a cybersecurity analyst. Extract ALL vulnerabilities from the following text.
 
 Text:

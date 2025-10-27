@@ -406,6 +406,7 @@
 
         <div class="action-buttons">
             <a href="/get_report" class="btn btn-primary">[v] Download Report</a>
+            <button class="btn btn-primary" onclick="generateStix()">[📦] Generate STIX File</button>
             <a href="/mitigation" class="btn btn-secondary">[?] Mitigation Finder</a>
             <a href="/" class="btn btn-secondary">[+] New Scan</a>
         </div>
@@ -741,6 +742,14 @@
 
         // Load dashboard on page load
         loadDashboard();
+
+
+
+        function generateStix() {
+        if (confirm('Generate STIX 2.1 file for Splunk/SIEM integration?\n\nThis will take a few moments.')) {
+            window.location.href = '/stix_loading';
+        }
+    }
     </script>
 </body>
 </html>

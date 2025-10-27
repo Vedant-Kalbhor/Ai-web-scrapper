@@ -13,6 +13,108 @@ app = Flask(__name__)
 REPORT_FILE = "vulnerability_report.txt"
 JSON_FILE = "vulnerability_report.json"
 
+# STIX Generator Import
+from stix_generator import generate_stix_from_report
+
+# STIX Generation Variables
+STIX_FILE_PATH = "vulnerabilities_stix.json"
+stix_status = {
+    "is_generating": False, 
+    "progress": None, 
+    "error": None, 
+    "download_ready": False
+}
+
+def generate_stix_task():
+    """Background task to generate STIX file"""
+    try:
+        stix_status.update({
+            "is_generating": True, 
+            "error": None, 
+            "download_ready": False,
+            "progress": "Reading vulnerability data..."
+        })
+        
+        print("[*] Starting STIX generation...")
+        
+        stix_status["progress"] = "Generating STIX format with AI..."
+        
+        # Generate STIX file from the vulnerabilities.json
+        output_path = generate_stix_from_report(
+            json_report_path=JSON_FILE,
+            output_path=STIX_FILE_PATH
+        )
+        
+        stix_status["progress"] = "Validating STIX file..."
+        
+        # Verify file was created
+        if not os.path.exists(output_path):
+            raise Exception("STIX file generation failed")
+        
+        stix_status["download_ready"] = True
+        stix_status["progress"] = "STIX file ready! ✅"
+        print("[+] STIX generation complete!")
+        
+    except Exception as e:
+        stix_status["error"] = str(e)
+        stix_status["progress"] = "Generation failed"
+        print(f"[!] STIX generation error: {e}")
+        traceback.print_exc()
+    finally:
+        stix_status["is_generating"] = False
+
+
+@app.route('/generate_stix', methods=['POST'])
+def generate_stix():
+    """Start STIX file generation in background"""
+    if not stix_status["is_generating"]:
+        # Check if vulnerability data exists
+        if not os.path.exists(JSON_FILE):
+            return jsonify({
+                "status": "error",
+                "message": "No vulnerability data found. Please run a scan first."
+            }), 400
+        
+        # Reset status
+        stix_status.update({
+            "is_generating": False,
+            "progress": None,
+            "error": None,
+            "download_ready": False
+        })
+        
+        thread = threading.Thread(target=generate_stix_task, daemon=True)
+        thread.start()
+        return jsonify({"status": "started"})
+    return jsonify({"status": "already_running"})
+
+
+@app.route('/stix_status')
+def get_stix_status():
+    """Get current status of STIX generation"""
+    return jsonify(stix_status)
+
+
+@app.route('/download_stix')
+def download_stix():
+    """Download the generated STIX file"""
+    if os.path.exists(STIX_FILE_PATH):
+        return send_file(
+            STIX_FILE_PATH, 
+            as_attachment=True,
+            download_name=f"vulnerabilities_stix_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            mimetype="application/json"
+        )
+    return "STIX file not found", 404
+
+
+@app.route('/stix_loading')
+def stix_loading_page():
+    """Show STIX generation loading page"""
+    return render_template('stix_loading.html')
+
+
+# Regular vulnerability scanning status
 report_status = {
     "is_generating": False,
     "progress": "",
@@ -33,7 +135,7 @@ def generate_report_task():
         report_status["current_step"] = 0
 
         # Clean old files
-        for file in [REPORT_FILE, JSON_FILE]:
+        for file in [REPORT_FILE, JSON_FILE, STIX_FILE_PATH]:
             if os.path.exists(file):
                 os.remove(file)
 

@@ -35,6 +35,10 @@ def get_vulnerability_urls():
         #     "type": "html",
         #     "name": "NVD Recent"
         # }
+           {"url": "https://www.oracle.com/security-alerts/", 
+            "type": "html",
+              "name": "Oracle Critical Patch Updates (CPU)"},
+                {"url": "https://osv.dev/feed.json", "type": "json", "name": "Open Source Vulnerabilities (OSV.dev)"}
     ]
 
 
@@ -48,8 +52,8 @@ def scrape_rss_feed(url):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
         response.raise_for_status()
-        
-        soup = BeautifulSoup(response.content, 'xml')
+        content = response.content[:150000]
+        soup = BeautifulSoup(content, 'xml')
         
         # Extract all text content
         text = soup.get_text(separator="\n", strip=True)
@@ -93,7 +97,7 @@ def scrape_json_api(url):
             print(f"  ✓ Found {len(vulnerabilities)} vulnerabilities in JSON")
             
             text_lines = []
-            for vuln in vulnerabilities[:100]:
+            for vuln in vulnerabilities[:50]:
                 cve_id = vuln.get('cveID', 'Unknown')
                 title = vuln.get('vulnerabilityName', 'Unknown')
                 description = vuln.get('shortDescription', 'No description')
