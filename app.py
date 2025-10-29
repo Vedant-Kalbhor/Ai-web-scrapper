@@ -8,6 +8,27 @@ from report import generate_report
 import json
 from datetime import datetime
 from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
+from datetime import datetime, timedelta
+import pickle
+
+CACHE_FILE = "vuln_cache.pkl"
+CACHE_DURATION = timedelta(days=1)  # 1 day cache validity
+
+def get_cached_report():
+    """Return cached data if it's still valid."""
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "rb") as f:
+            cache = pickle.load(f)
+        if datetime.now() - cache["timestamp"] < CACHE_DURATION:
+            print("✅ Using cached vulnerability report")
+            return cache["data"]
+    return None
+
+def save_cached_report(data):
+    """Save scraped + parsed report to cache."""
+    with open(CACHE_FILE, "wb") as f:
+        pickle.dump({"timestamp": datetime.now(), "data": data}, f)
+
 
 app = Flask(__name__)
 
@@ -125,15 +146,45 @@ report_status = {
     "total_steps": 4
 }
 
-
 def generate_report_task():
-    """Optimized report generation - parallel scraping"""
+    """Optimized report generation - parallel scraping with caching"""
     try:
         print(">> Starting vulnerability scan...")
         report_status["is_generating"] = True
         report_status["error"] = None
         report_status["download_ready"] = False
         report_status["current_step"] = 0
+
+        from datetime import datetime, timedelta
+        import pickle
+
+        CACHE_FILE = "vuln_cache.pkl"
+        CACHE_DURATION = timedelta(days=1)
+
+        def get_cached_report():
+            if os.path.exists(CACHE_FILE):
+                with open(CACHE_FILE, "rb") as f:
+                    cache = pickle.load(f)
+                if datetime.now() - cache["timestamp"] < CACHE_DURATION:
+                    print("✅ Using cached vulnerability report")
+                    return cache["data"]
+            return None
+
+        def save_cached_report(data):
+            with open(CACHE_FILE, "wb") as f:
+                pickle.dump({"timestamp": datetime.now(), "data": data}, f)
+
+        # Step 0: Check cache first
+        report_status["progress"] = "Checking cache..."
+        cached_data = get_cached_report()
+        if cached_data:
+            print("⚡ Returning cached report (same-day scan)")
+            with open(JSON_FILE, "w", encoding="utf-8") as f:
+                json.dump(cached_data, f, indent=2)
+            generate_report(cached_data["vulnerabilities"])
+            report_status["download_ready"] = True
+            report_status["progress"] = "Scan complete! [CACHED]"
+            return
 
         # Clean old files
         for file in [REPORT_FILE, JSON_FILE, STIX_FILE_PATH]:
@@ -148,7 +199,6 @@ def generate_report_task():
         # Step 2: Parallel scraping (MUCH FASTER!)
         report_status["current_step"] = 2
         report_status["progress"] = "Scraping all sources in parallel..."
-        
         scraped_data = scrape_all_parallel(max_workers=3)
 
         if not scraped_data:
@@ -157,7 +207,6 @@ def generate_report_task():
         # Step 3: AI Processing
         report_status["current_step"] = 3
         report_status["progress"] = "Analyzing vulnerabilities with AI..."
-        
         all_vulnerabilities = []
         for item in scraped_data:
             try:
@@ -189,8 +238,6 @@ def generate_report_task():
         # Step 4: Generate Reports
         report_status["current_step"] = 4
         report_status["progress"] = "Generating reports..."
-
-        # Generate text report
         generate_report(unique_vulns)
         print("[+] Text report created")
 
@@ -217,6 +264,9 @@ def generate_report_task():
         except Exception as e:
             print(f"[!] Could not generate AI insights: {e}")
 
+        # ✅ Save to cache for same-day reuse
+        save_cached_report(dashboard_data)
+
         report_status["download_ready"] = True
         report_status["progress"] = "Scan complete! [DONE]"
         print("[+] Report generation complete")
@@ -228,6 +278,7 @@ def generate_report_task():
         report_status["progress"] = "Error occurred"
     finally:
         report_status["is_generating"] = False
+
 
 
 @app.route('/')

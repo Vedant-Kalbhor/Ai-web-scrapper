@@ -30,6 +30,122 @@ def create_search_agent():
     return llm
 
 
+def search_exploits_for_cve(cve_id: str) -> list:
+    """
+    Search for available exploits for a specific CVE using Gemini web search
+    
+    Args:
+        cve_id: CVE identifier (e.g., CVE-2024-1234)
+        
+    Returns:
+        List of exploit information dictionaries
+    """
+    try:
+        print(f"🔎 Searching exploits for {cve_id}")
+        
+        llm = create_search_agent()
+        
+        exploit_prompt = f"""Search the web RIGHT NOW for available exploits, PoCs (Proof of Concepts), and exploit code for {cve_id}.
+
+SEARCH SOURCES:
+- Exploit-DB (exploit-db.com)
+- GitHub repositories with PoC code
+- PacketStorm Security
+- Metasploit modules
+- Security researcher blogs
+- CVE Details exploit references
+- Google Project Zero
+- NVD references section
+
+WHAT TO FIND:
+- Public exploit code availability
+- Proof-of-Concept (PoC) demonstrations
+- Metasploit/Exploit-DB modules
+- GitHub repositories with exploit code
+- Exploit maturity level (PoC, Functional, High)
+- Exploit type (Remote, Local, DoS, etc.)
+- Direct links to exploit code
+
+For EACH exploit found, extract:
+- Exploit Title/Name
+- Exploit Type (e.g., "Remote Code Execution", "Privilege Escalation", "Denial of Service")
+- Platform/System (e.g., "Linux", "Windows", "Multiple")
+- Availability Status (e.g., "Public PoC Available", "Metasploit Module", "GitHub Repository")
+- Exploit Link/URL (GitHub, Exploit-DB, etc.)
+- Maturity Level ("PoC", "Functional", "High", "Unknown")
+- Brief description (1-2 sentences about what the exploit does)
+
+FILTERING:
+- Only include verified, public exploits
+- Prioritize working exploits over theoretical PoCs
+- Include Metasploit modules if available
+- Note if actively being exploited in the wild
+
+Return your findings as a JSON array:
+[
+  {{
+    "exploit_title": "Apache Struts RCE Exploit",
+    "exploit_type": "Remote Code Execution",
+    "platform": "Multiple",
+    "availability": "Public PoC on GitHub",
+    "exploit_url": "https://github.com/example/cve-2024-xxxxx",
+    "maturity": "Functional",
+    "description": "Working exploit that allows unauthenticated remote code execution by sending crafted OGNL expressions."
+  }}
+]
+
+CRITICAL:
+1. Return ONLY the JSON array - no markdown, no extra text
+2. If no exploits found, return empty array: []
+3. Ensure all JSON is properly formatted
+4. All string values must use double quotes
+5. Validate URLs are real and accessible"""
+
+        response = llm.invoke(exploit_prompt)
+        content = response.content.strip()
+        
+        # Clean up the response
+        content = clean_json_response(content)
+        
+        try:
+            exploits = json.loads(content)
+            
+            if not isinstance(exploits, list):
+                exploits = [exploits] if isinstance(exploits, dict) else []
+            
+            # Validate each exploit entry
+            exploits = [validate_exploit(e) for e in exploits if validate_exploit(e)]
+            
+            print(f"✅ Found {len(exploits)} exploit(s) for {cve_id}")
+            return exploits
+            
+        except json.JSONDecodeError:
+            print(f"⚠️  Could not parse exploits JSON for {cve_id}, returning empty list")
+            return []
+            
+    except Exception as e:
+        print(f"❌ Error searching exploits for {cve_id}: {e}")
+        return []
+
+
+def validate_exploit(exploit: dict) -> dict:
+    """Validate and clean an exploit dictionary"""
+    if not isinstance(exploit, dict):
+        return None
+    
+    cleaned = {
+        "exploit_title": str(exploit.get("exploit_title", "")).strip() or "Unknown Exploit",
+        "exploit_type": str(exploit.get("exploit_type", "")).strip() or "Unknown Type",
+        "platform": str(exploit.get("platform", "")).strip() or "Unknown",
+        "availability": str(exploit.get("availability", "")).strip() or "Unknown",
+        "exploit_url": str(exploit.get("exploit_url", "")).strip() or None,
+        "maturity": str(exploit.get("maturity", "")).strip() or "Unknown",
+        "description": str(exploit.get("description", "")).strip() or "No description available"
+    }
+    
+    return cleaned
+
+
 def search_vulnerabilities_with_ai(query: str) -> dict:
     """
     Search for recent vulnerabilities using Gemini with built-in web search.
@@ -39,7 +155,7 @@ def search_vulnerabilities_with_ai(query: str) -> dict:
         query: Software name or organization name
         
     Returns:
-        Dictionary with vulnerabilities found
+        Dictionary with vulnerabilities found (now includes exploits)
     """
     try:
         print(f"🔍 Searching for vulnerabilities related to: {query}")
@@ -150,6 +266,16 @@ Remember: Users want CURRENT threats, not historical data. Focus on what's happe
             # Validate and clean each vulnerability entry
             vulnerabilities = [validate_vulnerability(v) for v in vulnerabilities if validate_vulnerability(v)]
             
+            # ✨ NEW: Search for exploits for each vulnerability
+            print(f"\n🎯 Searching for exploits for {len(vulnerabilities)} vulnerabilities...")
+            for vuln in vulnerabilities:
+                cve_id = vuln.get("cve_id", "")
+                if cve_id and cve_id != "N/A":
+                    exploits = search_exploits_for_cve(cve_id)
+                    vuln["exploits"] = exploits
+                else:
+                    vuln["exploits"] = []
+            
             # Sort by date (newest first)
             def get_sort_date(vuln):
                 date_str = vuln.get("date_disclosed", "")
@@ -167,7 +293,7 @@ Remember: Users want CURRENT threats, not historical data. Focus on what's happe
             
             vulnerabilities.sort(key=get_sort_date, reverse=True)
             
-            print(f"✅ Successfully parsed {len(vulnerabilities)} RECENT vulnerabilities")
+            print(f"✅ Successfully parsed {len(vulnerabilities)} RECENT vulnerabilities with exploit information")
             
             # Add warning if no recent vulnerabilities found
             if len(vulnerabilities) == 0:
@@ -251,7 +377,8 @@ def validate_vulnerability(vuln: dict) -> dict:
         "affected_product": str(vuln.get("affected_product", "")).strip() or "Unknown",
         "date_disclosed": str(vuln.get("date_disclosed", "")).strip() or "Unknown",
         "exploitation_status": str(vuln.get("exploitation_status", "")).strip() or "Unknown",
-        "source_url": str(vuln.get("source_url", "")).strip() or None
+        "source_url": str(vuln.get("source_url", "")).strip() or None,
+        "exploits": []  # Will be populated later
     }
     
     # ✅ DATE VALIDATION - Filter out old vulnerabilities
@@ -341,7 +468,8 @@ def extract_vulns_from_text(text: str, query: str) -> list:
                 "affected_product": query,
                 "date_disclosed": "Recent",
                 "exploitation_status": "Unknown",
-                "source_url": None
+                "source_url": None,
+                "exploits": []
             })
     else:
         # Create a single generic entry with the text
@@ -354,7 +482,8 @@ def extract_vulns_from_text(text: str, query: str) -> list:
             "affected_product": query,
             "date_disclosed": "Recent",
             "exploitation_status": "Unknown",
-            "source_url": None
+            "source_url": None,
+            "exploits": []
         })
     
     return vulnerabilities

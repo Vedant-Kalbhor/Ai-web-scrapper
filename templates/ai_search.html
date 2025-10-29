@@ -313,6 +313,117 @@
             border-radius: 5px;
         }
 
+        /* NEW: Exploits Section Styles */
+        .exploits-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff3cd;
+            border-left: 4px solid #ff6b6b;
+            border-radius: 8px;
+        }
+
+        .exploits-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .exploits-header h4 {
+            font-size: 1.1em;
+            color: #721c24;
+            margin: 0;
+        }
+
+        .exploits-badge {
+            padding: 4px 10px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .no-exploits {
+            color: #28a745;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .exploit-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ffc107;
+        }
+
+        .exploit-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .exploit-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .exploit-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .exploit-tag {
+            padding: 4px 10px;
+            background: #e9ecef;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .exploit-tag.type {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .exploit-tag.platform {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .exploit-tag.maturity {
+            background: #6c757d;
+            color: white;
+        }
+
+        .exploit-description {
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .exploit-link {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .exploit-link:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
         .vuln-footer {
             display: flex;
             justify-content: space-between;
@@ -386,6 +497,7 @@
             .search-box { flex-direction: column; }
             .vuln-header { flex-direction: column; }
             .vuln-info { grid-template-columns: 1fr; }
+            .exploit-meta { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
@@ -425,8 +537,8 @@
 
         <div class="loading-container" id="loadingContainer">
             <div class="loader"></div>
-            <p class="loading-text">Searching for vulnerabilities with AI...</p>
-            <p style="color: #666; margin-top: 10px; font-size: 0.9em;">This may take 10-30 seconds</p>
+            <p class="loading-text">Searching for vulnerabilities and exploits with AI...</p>
+            <p style="color: #666; margin-top: 10px; font-size: 0.9em;">This may take 20-60 seconds</p>
         </div>
 
         <div class="results-container" id="resultsContainer">
@@ -545,6 +657,42 @@
             const dateDisclosed = vuln.date_disclosed || 'Unknown';
             const exploitStatus = vuln.exploitation_status || 'Unknown';
             const sourceUrl = vuln.source_url;
+            const exploits = vuln.exploits || [];
+
+            // Create exploits section HTML
+            let exploitsHTML = '';
+            if (exploits.length > 0) {
+                exploitsHTML = `
+                    <div class="exploits-section">
+                        <div class="exploits-header">
+                            <h4>⚠️ Available Exploits</h4>
+                            <span class="exploits-badge">${exploits.length} Found</span>
+                        </div>
+                        ${exploits.map(exploit => `
+                            <div class="exploit-item">
+                                <div class="exploit-title">${exploit.exploit_title}</div>
+                                <div class="exploit-meta">
+                                    <span class="exploit-tag type">${exploit.exploit_type}</span>
+                                    <span class="exploit-tag platform">Platform: ${exploit.platform}</span>
+                                    <span class="exploit-tag maturity">Maturity: ${exploit.maturity}</span>
+                                    <span class="exploit-tag">${exploit.availability}</span>
+                                </div>
+                                <div class="exploit-description">${exploit.description}</div>
+                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">🔗 View Exploit Code</a>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                exploitsHTML = `
+                    <div class="exploits-section">
+                        <div class="exploits-header">
+                            <h4>✅ Exploit Status</h4>
+                        </div>
+                        <p class="no-exploits">No public exploits found for this vulnerability</p>
+                    </div>
+                `;
+            }
 
             return `
                 <div class="vulnerability-card" style="animation-delay: ${index * 0.1}s">
@@ -574,6 +722,8 @@
                         <strong>Description:</strong><br>
                         ${description}
                     </div>
+                    
+                    ${exploitsHTML}
                     
                     <div class="vuln-footer">
                         <div class="exploitation-status">
