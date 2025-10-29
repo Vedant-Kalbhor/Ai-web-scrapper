@@ -7,3 +7,7 @@ lxml
 html5lib
 python-dotenv
 webdriver-manager
+langchain-community
+duckduckgo-search
+requests
+ddgs

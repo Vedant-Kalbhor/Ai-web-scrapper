@@ -2,8 +2,8 @@ import os
 import threading
 import traceback
 from flask import Flask, render_template, redirect, url_for, jsonify, send_file, request
-from scrape import get_vulnerability_urls, scrape_content
-from parse import parse_vulnerabilities_with_ai, generate_ai_insights
+from scrape import scrape_all_parallel
+from parse import parse_vulnerabilities_with_ai, generate_ai_insights, find_mitigation
 from report import generate_report
 import json
 from datetime import datetime
@@ -149,7 +149,6 @@ def generate_report_task():
         report_status["current_step"] = 2
         report_status["progress"] = "Scraping all sources in parallel..."
         
-        from scrape import scrape_all_parallel
         scraped_data = scrape_all_parallel(max_workers=3)
 
         if not scraped_data:
@@ -181,7 +180,7 @@ def generate_report_task():
             elif not cve_id:  # Keep non-CVE vulnerabilities
                 unique_vulns.append(vuln)
 
-        # Sort by severity (HIGH > MEDIUM > LOW > UNKNOWN)
+        # Sort by severity (CRITICAL > HIGH > MEDIUM > LOW > UNKNOWN)
         severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "UNKNOWN": 4}
         unique_vulns.sort(key=lambda x: severity_order.get(x.get("severity", "UNKNOWN").upper(), 5))
 
@@ -233,11 +232,13 @@ def generate_report_task():
 
 @app.route('/')
 def index():
+    """Landing page"""
     return render_template("index.html")
 
 
 @app.route('/scan', methods=['POST'])
 def scan():
+    """Trigger vulnerability scan"""
     if not report_status["is_generating"]:
         print("[*] Starting new vulnerability scan...")
         thread = threading.Thread(target=generate_report_task, daemon=True)
@@ -249,26 +250,31 @@ def scan():
 
 @app.route('/scanning')
 def scanning():
+    """Scanning progress page"""
     return render_template("scanning.html")
 
 
 @app.route('/status')
 def status():
+    """Get scan status"""
     return jsonify(report_status)
 
 
 @app.route('/dashboard')
 def dashboard():
+    """Main dashboard"""
     return render_template("dashboard.html")
 
 
 @app.route('/mitigation')
 def mitigation_page():
+    """Mitigation finder page"""
     return render_template("mitigation.html")
 
 
 @app.route('/get_report')
 def get_report():
+    """Download text report"""
     if os.path.exists(REPORT_FILE):
         return send_file(REPORT_FILE, as_attachment=True)
     return "No report found", 404
@@ -276,6 +282,7 @@ def get_report():
 
 @app.route('/api/vulnerabilities')
 def api_vulnerabilities():
+    """Get all vulnerabilities as JSON"""
     if not os.path.exists(JSON_FILE):
         return jsonify({"error": "No data available. Please run a scan first."}), 404
 
@@ -286,7 +293,7 @@ def api_vulnerabilities():
 
 @app.route('/api/search', methods=['GET'])
 def api_search():
-    """Search vulnerabilities by software, company, or CVE ID"""
+    """Search vulnerabilities by software, company, or CVE ID (from local database)"""
     if not os.path.exists(JSON_FILE):
         return jsonify({"error": "No data available. Please run a scan first."}), 404
 
@@ -333,8 +340,7 @@ def api_search():
 
 @app.route('/api/mitigation', methods=['POST'])
 def api_mitigation():
-    from parse import find_mitigation
-    
+    """Find mitigation for a specific CVE or vulnerability"""
     data = request.get_json()
     query = data.get("query", "").strip()
 
@@ -342,75 +348,141 @@ def api_mitigation():
         return jsonify({"error": "No query provided"}), 400
 
     try:
+        print(f"[*] Finding mitigation for: {query}")
         result = find_mitigation(query)
         return jsonify(result)
     except Exception as e:
+        print(f"[!] Mitigation error: {e}")
+        traceback.print_exc()
         return jsonify({"error": f"Failed to get mitigation: {str(e)}"}), 500
 
 
+# ===================================================================
+# AI-POWERED WEB SEARCH ROUTES (NEW)
+# ===================================================================
+
 @app.route('/ai_search')
 def ai_search_page():
-    """AI-powered vulnerability search page"""
+    """AI-powered vulnerability search page (uses web search)"""
     return render_template('ai_search.html')
 
 
 @app.route('/api/ai_search', methods=['POST'])
 def api_ai_search():
     """
-    API endpoint for AI-powered vulnerability search
-    Uses Gemini's web search to find recent vulnerabilities
+    API endpoint for AI-powered vulnerability search with real-time web search.
+    Uses Gemini's native grounding to search the web for recent vulnerabilities.
+    
+    This is different from /api/search which searches the local database.
+    This endpoint searches the LIVE WEB for current vulnerabilities.
     """
-    data = request.get_json()
-    query = data.get('query', '').strip()
-    
-    if not query:
-        return jsonify({
-            "success": False,
-            "error": "Please provide a software or organization name"
-        }), 400
-    
-    print(f"[*] Searching vulnerabilities for: {query}")
-    
     try:
-        # Use AI to search for vulnerabilities
+        data = request.get_json()
+        query = data.get('query', '').strip()
+        
+        if not query:
+            return jsonify({
+                "success": False,
+                "error": "Please provide a software or organization name"
+            }), 400
+        
+        print(f"\n{'='*60}")
+        print(f"[🔍] AI Web Search Request: {query}")
+        print(f"{'='*60}")
+        
+        # Use the fixed search function with Gemini grounding
         result = search_vulnerabilities_with_ai(query)
-        print(f"[+] Found {result.get('total_found', 0)} vulnerabilities")
+        
+        if result.get('success'):
+            print(f"[✅] Search successful: Found {result.get('total_found', 0)} vulnerabilities")
+        else:
+            print(f"[❌] Search failed: {result.get('error', 'Unknown error')}")
+        
         return jsonify(result)
         
     except Exception as e:
-        print(f"[!] Error in AI search: {e}")
+        print(f"[❌] API Error: {e}")
+        traceback.print_exc()
         return jsonify({
             "success": False,
-            "error": f"Search failed: {str(e)}"
+            "error": f"Search failed: {str(e)}",
+            "query": query if 'query' in locals() else "Unknown"
         }), 500
 
 
 @app.route('/api/cve_details', methods=['POST'])
 def api_cve_details():
     """
-    Get detailed information about a specific CVE
+    Get detailed information about a specific CVE using web search and scraping.
+    This uses real-time web data from NVD, CISA, and other sources.
     """
-    data = request.get_json()
-    cve_id = data.get('cve_id', '').strip()
-    
-    if not cve_id:
-        return jsonify({
-            "success": False,
-            "error": "Please provide a CVE ID"
-        }), 400
-    
-    print(f"[*] Fetching details for: {cve_id}")
-    
     try:
+        data = request.get_json()
+        cve_id = data.get('cve_id', '').strip()
+        
+        if not cve_id:
+            return jsonify({
+                "success": False,
+                "error": "Please provide a CVE ID"
+            }), 400
+        
+        print(f"\n{'='*60}")
+        print(f"[🔍] CVE Details Request: {cve_id}")
+        print(f"{'='*60}")
+        
+        # Use the fixed search function
         result = search_vulnerability_details(cve_id)
+        
+        if result.get('success'):
+            print(f"[✅] CVE details retrieved successfully")
+        else:
+            print(f"[❌] CVE details failed: {result.get('error', 'Unknown error')}")
+        
         return jsonify(result)
         
     except Exception as e:
-        print(f"[!] Error fetching CVE details: {e}")
+        print(f"[❌] API Error: {e}")
+        traceback.print_exc()
         return jsonify({
             "success": False,
-            "error": f"Failed to fetch details: {str(e)}"
+            "error": f"Failed to fetch details: {str(e)}",
+            "cve_id": cve_id if 'cve_id' in locals() else "Unknown"
         }), 500
 
+
+# ===================================================================
+# ERROR HANDLERS
+# ===================================================================
+
+@app.errorhandler(404)
+def not_found(e):
+    """Handle 404 errors"""
+    return jsonify({"error": "Endpoint not found"}), 404
+
+
+@app.errorhandler(500)
+def internal_error(e):
+    """Handle 500 errors"""
+    return jsonify({"error": "Internal server error"}), 500
+
+
+# ===================================================================
+# MAIN
+# ===================================================================
+
 if __name__ == '__main__':
-    app.run(debug=False, use_reloader=False)
+    print("\n" + "="*60)
+    print("🛡️  AI-Powered Vulnerability Scanner")
+    print("="*60)
+    print("\n[INFO] Starting Flask application...")
+    print("[INFO] Features enabled:")
+    print("  ✅ Multi-source vulnerability scanning")
+    print("  ✅ AI-powered analysis (Gemini)")
+    print("  ✅ Real-time web search (Gemini Grounding)")
+    print("  ✅ STIX 2.1 generation")
+    print("  ✅ Interactive dashboard")
+    print("  ✅ Mitigation finder")
+    print("\n[INFO] Server starting at http://localhost:5000")
+    print("="*60 + "\n")
+    
+    app.run(debug=False, use_reloader=False, host='0.0.0.0', port=5000)

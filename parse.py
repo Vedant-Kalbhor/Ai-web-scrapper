@@ -32,7 +32,7 @@ def parse_vulnerabilities_with_ai(text, source_url):
 
     limited_text = "\n".join(limited_lines)
     if len(limited_text) > 100000:
-        limited_text = limited_text[:100000]
+        limited_text = limited_text[:100000][::-1]
     prompt = f"""You are a cybersecurity analyst. Extract ALL vulnerabilities from the following text.
 
 Text:
