@@ -523,7 +523,7 @@ def internal_error(e):
 
 if __name__ == '__main__':
     print("\n" + "="*60)
-    print("🛡️  AI-Powered Vulnerability Scanner")
+    print("AI-Powered Vulnerability Scanner")
     print("="*60)
     print("\n[INFO] Starting Flask application...")
     print("[INFO] Features enabled:")

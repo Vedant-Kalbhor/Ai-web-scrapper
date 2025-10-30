@@ -41,7 +41,7 @@ def search_exploits_for_cve(cve_id: str) -> list:
         List of exploit information dictionaries
     """
     try:
-        print(f"🔎 Searching exploits for {cve_id}")
+        print(f"Searching exploits for {cve_id}")
         
         llm = create_search_agent()
         
@@ -158,7 +158,7 @@ def search_vulnerabilities_with_ai(query: str) -> dict:
         Dictionary with vulnerabilities found (now includes exploits)
     """
     try:
-        print(f"🔍 Searching for vulnerabilities related to: {query}")
+        print(f"Searching for vulnerabilities related to: {query}")
         
         # Get current date for filtering
         from datetime import datetime, timedelta
@@ -267,7 +267,7 @@ Remember: Users want CURRENT threats, not historical data. Focus on what's happe
             vulnerabilities = [validate_vulnerability(v) for v in vulnerabilities if validate_vulnerability(v)]
             
             # ✨ NEW: Search for exploits for each vulnerability
-            print(f"\n🎯 Searching for exploits for {len(vulnerabilities)} vulnerabilities...")
+            print(f"\n Searching for exploits for {len(vulnerabilities)} vulnerabilities...")
             for vuln in vulnerabilities:
                 cve_id = vuln.get("cve_id", "")
                 if cve_id and cve_id != "N/A":

@@ -263,7 +263,7 @@
         <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
 
         <div class="header">
-            <h1>🔒 Mitigation Finder</h1>
+            <h1>Mitigation Finder</h1>
             <p>Get instant mitigation guidance for any vulnerability</p>
         </div>
 
@@ -277,7 +277,7 @@
                     onkeypress="if(event.key==='Enter') findMitigation()"
                 >
                 <button class="search-btn" id="searchBtn" onclick="findMitigation()">
-                    🔍 Find Solution
+                   Find Solution
                 </button>
             </div>
 
@@ -311,7 +311,7 @@
 
             // Show loading state
             btn.disabled = true;
-            btn.textContent = '⏳ Searching...';
+            btn.textContent = ' Searching...';
             container.classList.remove('hidden');
             container.innerHTML = `
                 <div class="result-card">
@@ -340,7 +340,7 @@
                 showError('Failed to connect to server. Please try again.');
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🔍 Find Solution';
+                btn.textContent = 'Find Solution';
             }
         }
 
@@ -358,7 +358,7 @@
             if (data.summary) {
                 html += `
                     <div class="section">
-                        <div class="section-title">📝 Summary</div>
+                        <div class="section-title">Summary</div>
                         <div class="section-content">${data.summary}</div>
                     </div>
                 `;
@@ -367,7 +367,7 @@
             if (data.mitigation) {
                 html += `
                     <div class="section">
-                        <div class="section-title">🛡️ Mitigation Steps</div>
+                        <div class="section-title">Mitigation Steps</div>
                         <div class="section-content">${data.mitigation}</div>
                     </div>
                 `;
@@ -380,7 +380,7 @@
                         <ul class="references">
                 `;
                 data.references.forEach(ref => {
-                    html += `<li><a href="${ref}" target="_blank">🌐 ${ref}</a></li>`;
+                    html += `<li><a href="${ref}" target="_blank"> ${ref}</a></li>`;
                 });
                 html += `
                         </ul>
@@ -396,7 +396,7 @@
             document.getElementById('resultContainer').innerHTML = `
                 <div class="result-card">
                     <div class="error-box">
-                        <h3 style="margin-bottom: 10px;">⚠️ Error</h3>
+                        <h3 style="margin-bottom: 10px;">Error</h3>
                         <p>${message}</p>
                     </div>
                 </div>
