@@ -24,7 +24,7 @@ JSON_FILE = "vulnerability_report.json"
 def create_search_agent():
     """Creates Gemini LLM with web search enabled"""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-exp",
+        model="gemini-2.5-flash-exp",
         temperature=0.1,  # Lower temperature for more factual responses
         google_api_key=os.getenv("GOOGLE_API_KEY")
     )
@@ -55,57 +55,66 @@ def search_vulnerabilities_with_ai(query: str) -> dict:
 **TODAY'S DATE: {current_date.strftime("%Y-%m-%d")}**
 
 **CRITICAL MISSION:**
-Search for the MOST RECENT vulnerabilities (CVEs) related to "{query}" that were:
-1. **Disclosed in {current_year}** (CVE-{current_year}-XXXXX format)
-2. **Published within the last 180 days** (since {last_180_days})
-3. **Currently in the news or security advisories in {current_month}**
+Search for the MOST RECENT vulnerabilities (CVEs) related to "{query}" focusing on:
+1. **CVE-{current_year}-XXXXX format (PRIMARY PRIORITY)**
+2. **CVE-{current_year-1}-XXXXX format (SECONDARY PRIORITY)**
+3. Check vendor security bulletins published in {current_year}
+4. Look for "Critical Patch Update" or "Security Advisory" from {current_month}
 
-**SEARCH STRATEGY:**
-1. Use search terms like: "{query} vulnerability {current_year}", "{query} CVE {current_year}", "{query} security advisory {current_month}"
-2. Look for CVE IDs starting with CVE-{current_year}- or CVE-{current_year-1}-
-3. Prioritize vulnerabilities from vendor security pages published THIS MONTH
-4. Check CISA KEV catalog for actively exploited vulnerabilities
-5. Look for "zero-day", "just disclosed", "recently patched" keywords
+**SEARCH STRATEGY FOR ORACLE AND MAJOR VENDORS:**
+1. ALWAYS search: "{query} CVE {current_year}" OR "{query} security advisory {current_year}"
+2. Check vendor pages: "{query}.com/security/alerts {current_year}"
+3. Search: "{query} Critical Patch Update {current_month}" OR "{query} CPU {current_month}"
+4. Look for quarterly security updates (January, April, July, October)
+5. Search NVD: "site:nvd.nist.gov {query} {current_year}"
 
-**AUTHORITATIVE SOURCES (Use these ONLY):**
-- nvd.nist.gov (check "Recently Published" section)
-- cve.mitre.org
-- www.cisa.gov/known-exploited-vulnerabilities
-- Vendor security bulletins (microsoft.com/security, cisco.com/security, etc.)
-- Security news from THIS WEEK/MONTH ONLY
+**CRITICAL: FOR ORACLE SPECIFICALLY:**
+- Oracle releases quarterly Critical Patch Updates (CPUs)
+- Search: "Oracle Critical Patch Update {current_year}"
+- Search: "Oracle CPU {current_month} {current_year}"
+- Check: www.oracle.com/security-alerts/cpujan{current_year}.html (or cpuapr, cpujul, cpuoct)
+- Look for CVE-{current_year}- entries in Oracle security bulletins
+
+**AUTHORITATIVE SOURCES (Priority Order):**
+1. Vendor security pages (oracle.com/security-alerts, microsoft.com/security, etc.)
+2. nvd.nist.gov (filter by {current_year})
+3. cve.mitre.org
+4. www.cisa.gov/known-exploited-vulnerabilities
+5. Security advisories published in {current_year}
 
 **OUTPUT FORMAT:**
-Return ONLY a JSON array with LATEST vulnerabilities:
+Return ONLY a JSON array with vulnerabilities:
 
 [
   {{
     "cve_id": "CVE-{current_year}-XXXXX",
-    "title": "Brief title",
+    "title": "Brief descriptive title",
     "severity": "CRITICAL/HIGH/MEDIUM/LOW",
     "cvss_score": 9.8,
-    "description": "Factual description",
-    "affected_product": "Exact product and version",
-    "date_disclosed": "YYYY-MM-DD (must be {current_year} or {current_year-1})",
-    "exploitation_status": "Status from official source"
+    "description": "What the vulnerability does",
+    "affected_product": "Exact product name and affected versions",
+    "date_disclosed": "YYYY-MM-DD",
+    "exploitation_status": "Actively Exploited / PoC Available / Not Known",
+    "vendor": "{query}"
   }}
 ]
-**STRICT FILTERING RULES:**
-- ✅ Always include CVEs starting with CVE-{current_year}- (even if date not found)
-- ✅ Include CVEs from Oracle, Microsoft, Cisco, or other vendor advisories published in {current_year}
-- ✅ Include CISA KEV entries referencing {current_year} CVEs
-- ❌ Reject CVEs older than {current_year-1} (2024 or earlier)
-- ✅ Prioritize recent vendor advisories even if publication date is not clearly stated
 
+**STRICT RULES:**
+- âœ… INCLUDE any CVE-{current_year}- found on vendor pages (even without exact date)
+- âœ… INCLUDE CVE-{current_year-1}- if found in {current_year} advisories
+- âœ… Prioritize CVEs from vendor's official security bulletin
+- âœ… Include CVEs from quarterly patch updates (CPU, PSU, etc.)
+- âŒ EXCLUDE CVEs from {current_year-2} ({current_year-2}) or earlier
+- âŒ EXCLUDE CVEs without vendor confirmation
 
-**VERIFICATION CHECKLIST:**
-- ✅ CVE year is {current_year} or {current_year-1}
-- ✅ Disclosure date is recent (within 90 days)
-- ✅ Found on official NVD/MITRE/CISA/vendor pages
-- ✅ Matches current security news
+**VERIFICATION:**
+- Every CVE MUST be from a vendor security page OR nvd.nist.gov
+- Include the source URL where you found it in your search
+- For Oracle: Check oracle.com/security-alerts/ for latest CPUs
 
-If you cannot find RECENT vulnerabilities (last 90 days), return empty array: []
+If NO vulnerabilities found from {current_year}, return empty array: []
 
-Return ONLY the JSON array - no markdown, no explanations, no old CVEs."""
+Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
 
         print("⏳ Invoking Gemini with strict verification prompt...")
         response = llm.invoke(search_prompt)
