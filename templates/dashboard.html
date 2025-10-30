@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vulnerability Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Markdown parser (marked) & sanitizer (DOMPurify) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -317,8 +323,22 @@
         .insights-content {
             line-height: 1.8;
             color: #555;
-            white-space: pre-wrap;
+            /* allow rendered HTML from markdown to flow normally */
         }
+        .insights-content pre {
+            overflow-x: auto;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f4f4f4;
+            font-family: monospace;
+        }
+        .insights-content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
 
         .loading {
             text-align: center;
@@ -380,7 +400,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>[#] Vulnerability Dashboard</h1>
+            <h1>Vulnerability Dashboard</h1>
             <p class="subtitle" id="lastUpdated">Loading...</p>
         </div>
 
@@ -394,8 +414,8 @@
                     placeholder="Search by software, company, CVE ID, or product name..."
                     onkeypress="if(event.key==='Enter') searchVulnerabilities()"
                 >
-                <button class="search-btn" onclick="searchVulnerabilities()">[>] Search</button>
-                <button class="clear-btn" onclick="clearSearch()" id="clearBtn" style="display: none;">[x] Clear</button>
+                <button class="search-btn" onclick="searchVulnerabilities()">Search</button>
+                <button class="clear-btn" onclick="clearSearch()" id="clearBtn" style="display: none;">Clear</button>
             </div>
             <div class="search-examples">
                 <span>Examples:</span>
@@ -414,11 +434,11 @@
         <div id="statsGrid" class="stats-grid"></div>
 
         <div class="action-buttons">
-            <a href="/get_report" class="btn btn-primary">[v] Download Report</a>
-            <button class="btn btn-primary" onclick="generateStix()">[📦] Generate STIX File</button>
-            <a href="/ai_search" class="btn btn-primary">[🔍] AI Vulnerability Search</a>
-            <a href="/mitigation" class="btn btn-secondary">[?] Mitigation Finder</a>
-            <a href="/" class="btn btn-secondary">[+] New Scan</a>
+            <a href="/get_report" class="btn btn-primary">Download Report</a>
+            <button class="btn btn-primary" onclick="generateStix()">Generate STIX File</button>
+            <a href="/ai_search" class="btn btn-primary"> AI Vulnerability Search</a>
+            <a href="/mitigation" class="btn btn-secondary">Mitigation Finder</a>
+            <a href="/" class="btn btn-secondary">New Scan</a>
         </div>
 
         <div id="chartsSection" class="charts-section"></div>
@@ -479,22 +499,22 @@
 
             const statsHTML = `
                 <div class="stat-card">
-                    <div class="icon">[#]</div>
+                    
                     <div class="value">${vulns.length}</div>
                     <div class="label">${isSearchActive ? 'Matching Results' : 'Total Vulnerabilities'}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">[!]</div>
+                    
                     <div class="value">${critical}</div>
                     <div class="label">Critical/High</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">[~]</div>
+                    
                     <div class="value">${severityCounts.MEDIUM}</div>
                     <div class="label">Medium Risk</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">[*]</div>
+                    
                     <div class="value">${data.sources_scanned || 'N/A'}</div>
                     <div class="label">Sources Scanned</div>
                 </div>
@@ -505,11 +525,11 @@
         function renderCharts(vulns) {
             const chartsHTML = `
                 <div class="card">
-                    <h3>[%] Severity Distribution</h3>
+                    <h3>Severity Distribution</h3>
                     <canvas id="severityChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>[^] Top Affected Products</h3>
+                    <h3>Top Affected Products</h3>
                     <canvas id="productsChart"></canvas>
                 </div>
             `;
@@ -599,7 +619,7 @@
 
         function renderTable(vulns) {
             let tableHTML = `
-                <h3>[=] Vulnerability Details</h3>
+                <h3>Vulnerability Details</h3>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -653,15 +673,36 @@
 
         function loadInsights(insights) {
             const box = document.getElementById('insightsBox');
-            
+
             if (insights) {
-                box.innerHTML = `
-                    <h3>[i] AI Security Insights</h3>
-                    <div class="insights-content">${insights}</div>
-                `;
+                try {
+                    // Configure marked options (disable header id mangling so header anchors don't get weird names)
+                    marked.setOptions({
+                        mangle: false,
+                        headerIds: false
+                    });
+
+                    // Convert markdown -> HTML
+                    const rawHtml = marked.parse(insights);
+
+                    // Sanitize HTML to avoid XSS
+                    const safeHtml = DOMPurify.sanitize(rawHtml);
+
+                    box.innerHTML = `
+                        <h3>AI Security Insights</h3>
+                        <div class="insights-content">${safeHtml}</div>
+                    `;
+                } catch (e) {
+                    console.error('Markdown render error:', e);
+                    // Fallback: show raw text in a pre block to avoid losing content
+                    box.innerHTML = `
+                        <h3>AI Security Insights</h3>
+                        <div class="insights-content"><pre>${insights}</pre></div>
+                    `;
+                }
             } else {
                 box.innerHTML = `
-                    <h3>[i] AI Security Insights</h3>
+                    <h3>AI Security Insights</h3>
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>Generating insights...</p>

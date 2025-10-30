@@ -599,7 +599,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>[🔍] AI Vulnerability Search</h1>
+            <h1>AI Vulnerability Search</h1>
             <p class="subtitle">Powered by Gemini AI with Real-Time Web Search</p>
             <a href="/dashboard" class="back-btn">[←] Back to Dashboard</a>
         </div>
@@ -620,7 +620,7 @@
                     onkeypress="if(event.key==='Enter') searchVulnerabilities()"
                 >
                 <button class="search-btn" id="searchBtn" onclick="searchVulnerabilities()">
-                    [>] Search Vulnerabilities
+                    Search Vulnerabilities
                 </button>
             </div>
             <div class="examples">
@@ -685,7 +685,7 @@
             // Disable search button
             const searchBtn = document.getElementById('searchBtn');
             searchBtn.disabled = true;
-            searchBtn.textContent = '[⏳] Searching...';
+            searchBtn.textContent = 'Searching...';
 
             try {
                 const response = await fetch('/api/ai_search', {
@@ -715,7 +715,7 @@
             } finally {
                 // Re-enable search button
                 searchBtn.disabled = false;
-                searchBtn.textContent = '[>] Search Vulnerabilities';
+                searchBtn.textContent = 'Search Vulnerabilities';
             }
         }
 
@@ -772,7 +772,7 @@
                 exploitsHTML = `
                     <div class="exploits-section">
                         <div class="exploits-header">
-                            <h4>⚠️ Available Exploits</h4>
+                            <h4>Available Exploits</h4>
                             <span class="exploits-badge">${exploits.length} Found</span>
                         </div>
                         ${exploits.map(exploit => `
@@ -785,7 +785,7 @@
                                     <span class="exploit-tag">${exploit.availability}</span>
                                 </div>
                                 <div class="exploit-description">${exploit.description}</div>
-                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">🔗 View Exploit Code</a>` : ''}
+                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">View Exploit Code</a>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -794,7 +794,7 @@
                 exploitsHTML = `
                     <div class="exploits-section">
                         <div class="exploits-header">
-                            <h4>✅ Exploit Status</h4>
+                            <h4>Exploit Status</h4>
                         </div>
                         <p class="no-exploits">No public exploits found for this vulnerability</p>
                     </div>
@@ -846,7 +846,7 @@
 
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = `[!] Error: ${message}`;
+            errorDiv.textContent = `Error: ${message}`;
             errorDiv.classList.add('active');
             
             // Auto-hide after 5 seconds
