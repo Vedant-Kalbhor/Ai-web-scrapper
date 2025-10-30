@@ -24,7 +24,7 @@ JSON_FILE = "vulnerability_report.json"
 def create_search_agent():
     """Creates Gemini LLM with web search enabled"""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash-exp",
+        model="gemini-2.0-flash-exp",
         temperature=0.1,  # Lower temperature for more factual responses
         google_api_key=os.getenv("GOOGLE_API_KEY")
     )

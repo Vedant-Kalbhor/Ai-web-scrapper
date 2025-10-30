@@ -38,7 +38,11 @@ def get_vulnerability_urls():
            {"url": "https://www.oracle.com/security-alerts/", 
             "type": "html",
               "name": "Oracle Critical Patch Updates (CPU)"},
-                {"url": "https://osv.dev/feed.json", "type": "json", "name": "Open Source Vulnerabilities (OSV.dev)"}
+                {"url": "https://osv.dev/feed.json", "type": "json", "name": "Open Source Vulnerabilities (OSV.dev)"},
+            {"url": "https://app.opencve.io/cve/", 
+             "type": "html", 
+             "name": "OpenCVE"}
+
     ]
 
 

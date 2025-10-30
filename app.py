@@ -19,6 +19,11 @@ from verification_config import (
     VERIFICATION_RULES
 )
 
+from exploit_scraper import scrape_all_exploits_parallel
+from exploit_parser import enrich_exploit_with_ai
+
+
+
 CACHE_FILE = "vuln_cache.pkl"
 CACHE_DURATION = timedelta(days=1)  # 1 day cache validity
 
@@ -93,7 +98,60 @@ def generate_stix_task():
     finally:
         stix_status["is_generating"] = False
 
+EXPLOITS_JSON_FILE = "exploits_report.json"
 
+@app.route('/exploits')
+def exploits_page():
+    """Latest exploits page"""
+    return render_template('exploits.html')
+
+
+@app.route('/api/exploits')
+def api_exploits():
+    """Get latest exploits from multiple sources"""
+    try:
+        print("\n[*] Starting exploit scraping...")
+        
+        # Scrape all sources in parallel
+        exploits = scrape_all_exploits_parallel(max_workers=3)
+        
+        if not exploits:
+            return jsonify({
+                "error": "No exploits found",
+                "exploits": [],
+                "total_exploits": 0
+            }), 404
+        
+        # Enrich first 50 exploits with AI descriptions (increased from 30)
+        print(f"[*] Enriching top {min(50, len(exploits))} exploits with AI...")
+        for i, exploit in enumerate(exploits[:50]):
+            try:
+                exploits[i] = enrich_exploit_with_ai(exploit)
+            except Exception as e:
+                print(f"[!] Could not enrich exploit {exploit.get('id')}: {e}")
+        
+        # Save to JSON file
+        exploit_data = {
+            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "total_exploits": len(exploits),
+            "exploits": exploits
+        }
+        
+        with open(EXPLOITS_JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump(exploit_data, f, indent=2)
+        
+        print(f"[+] Successfully scraped {len(exploits)} exploits")
+        
+        return jsonify(exploit_data)
+        
+    except Exception as e:
+        print(f"[!] Error in exploit scraping: {e}")
+        traceback.print_exc()
+        return jsonify({
+            "error": f"Failed to scrape exploits: {str(e)}",
+            "exploits": [],
+            "total_exploits": 0
+        }), 500
 @app.route('/generate_stix', methods=['POST'])
 def generate_stix():
     """Start STIX file generation in background"""
