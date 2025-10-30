@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitigation Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -256,6 +258,18 @@
             .search-box { flex-direction: column; }
             .result-header { flex-direction: column; gap: 15px; }
         }
+        pre, code {
+        background: #f4f4f4;
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-family: monospace;
+        }
+
+        pre {
+            overflow-x: auto;
+            padding: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -359,7 +373,7 @@
                 html += `
                     <div class="section">
                         <div class="section-title">Summary</div>
-                        <div class="section-content">${data.summary}</div>
+                        <div class="section-content">${marked.parse(data.summary)}</div>
                     </div>
                 `;
             }
@@ -368,7 +382,7 @@
                 html += `
                     <div class="section">
                         <div class="section-title">Mitigation Steps</div>
-                        <div class="section-content">${data.mitigation}</div>
+                        <div class="section-content">${marked.parse(data.mitigation)}</div>
                     </div>
                 `;
             }
@@ -376,7 +390,7 @@
             if (data.references && data.references.length > 0) {
                 html += `
                     <div class="section">
-                        <div class="section-title">🔗 References</div>
+                        <div class="section-title">References</div>
                         <ul class="references">
                 `;
                 data.references.forEach(ref => {

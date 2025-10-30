@@ -399,11 +399,11 @@ def api_mitigation():
         return jsonify({"error": "No query provided"}), 400
 
     try:
-        print(f"[*] Finding mitigation for: {query}")
+        print(f"Finding mitigation for: {query}")
         result = find_mitigation(query)
         return jsonify(result)
     except Exception as e:
-        print(f"[!] Mitigation error: {e}")
+        print(f"Mitigation error: {e}")
         traceback.print_exc()
         return jsonify({"error": f"Failed to get mitigation: {str(e)}"}), 500
 
@@ -438,7 +438,7 @@ def api_ai_search():
             }), 400
         
         print(f"\n{'='*60}")
-        print(f"[🔍] AI Web Search Request: {query}")
+        print(f"AI Web Search Request: {query}")
         print(f"{'='*60}")
         
         # Use the fixed search function with Gemini grounding

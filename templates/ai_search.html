@@ -678,7 +678,7 @@
                                     <span class="exploit-tag">${exploit.availability}</span>
                                 </div>
                                 <div class="exploit-description">${exploit.description}</div>
-                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">🔗 View Exploit Code</a>` : ''}
+                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">View Exploit Code</a>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -737,7 +737,7 @@
 
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = `[!] Error: ${message}`;
+            errorDiv.textContent = `Error: ${message}`;
             errorDiv.classList.add('active');
             
             // Auto-hide after 5 seconds
