@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitigation Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -256,6 +258,18 @@
             .search-box { flex-direction: column; }
             .result-header { flex-direction: column; gap: 15px; }
         }
+        pre, code {
+        background: #f4f4f4;
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-family: monospace;
+        }
+
+        pre {
+            overflow-x: auto;
+            padding: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -263,7 +277,7 @@
         <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
 
         <div class="header">
-            <h1>🔒 Mitigation Finder</h1>
+            <h1>Mitigation Finder</h1>
             <p>Get instant mitigation guidance for any vulnerability</p>
         </div>
 
@@ -277,7 +291,7 @@
                     onkeypress="if(event.key==='Enter') findMitigation()"
                 >
                 <button class="search-btn" id="searchBtn" onclick="findMitigation()">
-                    🔍 Find Solution
+                   Find Solution
                 </button>
             </div>
 
@@ -311,7 +325,7 @@
 
             // Show loading state
             btn.disabled = true;
-            btn.textContent = '⏳ Searching...';
+            btn.textContent = ' Searching...';
             container.classList.remove('hidden');
             container.innerHTML = `
                 <div class="result-card">
@@ -340,7 +354,7 @@
                 showError('Failed to connect to server. Please try again.');
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🔍 Find Solution';
+                btn.textContent = 'Find Solution';
             }
         }
 
@@ -358,8 +372,8 @@
             if (data.summary) {
                 html += `
                     <div class="section">
-                        <div class="section-title">📝 Summary</div>
-                        <div class="section-content">${data.summary}</div>
+                        <div class="section-title">Summary</div>
+                        <div class="section-content">${marked.parse(data.summary)}</div>
                     </div>
                 `;
             }
@@ -367,8 +381,8 @@
             if (data.mitigation) {
                 html += `
                     <div class="section">
-                        <div class="section-title">🛡️ Mitigation Steps</div>
-                        <div class="section-content">${data.mitigation}</div>
+                        <div class="section-title">Mitigation Steps</div>
+                        <div class="section-content">${marked.parse(data.mitigation)}</div>
                     </div>
                 `;
             }
@@ -376,11 +390,11 @@
             if (data.references && data.references.length > 0) {
                 html += `
                     <div class="section">
-                        <div class="section-title">🔗 References</div>
+                        <div class="section-title">References</div>
                         <ul class="references">
                 `;
                 data.references.forEach(ref => {
-                    html += `<li><a href="${ref}" target="_blank">🌐 ${ref}</a></li>`;
+                    html += `<li><a href="${ref}" target="_blank"> ${ref}</a></li>`;
                 });
                 html += `
                         </ul>
@@ -396,7 +410,7 @@
             document.getElementById('resultContainer').innerHTML = `
                 <div class="result-card">
                     <div class="error-box">
-                        <h3 style="margin-bottom: 10px;">⚠️ Error</h3>
+                        <h3 style="margin-bottom: 10px;">Error</h3>
                         <p>${message}</p>
                     </div>
                 </div>

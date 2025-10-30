@@ -407,11 +407,11 @@ def api_mitigation():
         return jsonify({"error": "No query provided"}), 400
 
     try:
-        print(f"[*] Finding mitigation for: {query}")
+        print(f"Finding mitigation for: {query}")
         result = find_mitigation(query)
         return jsonify(result)
     except Exception as e:
-        print(f"[!] Mitigation error: {e}")
+        print(f"Mitigation error: {e}")
         traceback.print_exc()
         return jsonify({"error": f"Failed to get mitigation: {str(e)}"}), 500
 
@@ -444,7 +444,20 @@ def api_ai_search():
     print(f"[*] Verification enabled: All results will be verified")
     
     try:
-        # Use the updated search function with verification
+        data = request.get_json()
+        query = data.get('query', '').strip()
+        
+        if not query:
+            return jsonify({
+                "success": False,
+                "error": "Please provide a software or organization name"
+            }), 400
+        
+        print(f"\n{'='*60}")
+        print(f"AI Web Search Request: {query}")
+        print(f"{'='*60}")
+        
+        # Use the fixed search function with Gemini grounding
         result = search_vulnerabilities_with_ai(query)
         
         # Add verification statistics
@@ -601,7 +614,7 @@ def internal_error(e):
 
 if __name__ == '__main__':
     print("\n" + "="*60)
-    print("🛡️  AI-Powered Vulnerability Scanner")
+    print("AI-Powered Vulnerability Scanner")
     print("="*60)
     print("\n[INFO] Starting Flask application...")
     print("[INFO] Features enabled:")
