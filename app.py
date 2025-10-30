@@ -10,6 +10,14 @@ from datetime import datetime
 from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
 from datetime import datetime, timedelta
 import pickle
+# Near the top with other imports:
+from enhanced_verification import CVEVerifier, VulnerabilityValidator
+from verification_config import (
+    get_source_reliability, 
+    is_authoritative_source,
+    format_verification_report,
+    VERIFICATION_RULES
+)
 
 CACHE_FILE = "vuln_cache.pkl"
 CACHE_DURATION = timedelta(days=1)  # 1 day cache validity
@@ -421,83 +429,153 @@ def ai_search_page():
 @app.route('/api/ai_search', methods=['POST'])
 def api_ai_search():
     """
-    API endpoint for AI-powered vulnerability search with real-time web search.
-    Uses Gemini's native grounding to search the web for recent vulnerabilities.
-    
-    This is different from /api/search which searches the local database.
-    This endpoint searches the LIVE WEB for current vulnerabilities.
+    API endpoint for AI-powered vulnerability search with VERIFICATION
     """
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    
+    if not query:
+        return jsonify({
+            "success": False,
+            "error": "Please provide a software or organization name"
+        }), 400
+    
+    print(f"[*] AI Search Request: {query}")
+    print(f"[*] Verification enabled: All results will be verified")
+    
     try:
-        data = request.get_json()
-        query = data.get('query', '').strip()
-        
-        if not query:
-            return jsonify({
-                "success": False,
-                "error": "Please provide a software or organization name"
-            }), 400
-        
-        print(f"\n{'='*60}")
-        print(f"[🔍] AI Web Search Request: {query}")
-        print(f"{'='*60}")
-        
-        # Use the fixed search function with Gemini grounding
+        # Use the updated search function with verification
         result = search_vulnerabilities_with_ai(query)
         
+        # Add verification statistics
         if result.get('success'):
-            print(f"[✅] Search successful: Found {result.get('total_found', 0)} vulnerabilities")
-        else:
-            print(f"[❌] Search failed: {result.get('error', 'Unknown error')}")
+            result['verification_stats'] = {
+                'total_candidates': result.get('total_checked', 0),
+                'verified_vulnerabilities': result.get('total_found', 0),
+                'rejection_rate': f"{((result.get('total_checked', 0) - result.get('total_found', 0)) / max(result.get('total_checked', 1), 1) * 100):.1f}%",
+                'confidence_threshold': VERIFICATION_RULES['confidence_thresholds']['medium']
+            }
         
+        print(f"[+] Search complete: {result.get('total_found', 0)} verified vulnerabilities")
         return jsonify(result)
         
     except Exception as e:
-        print(f"[❌] API Error: {e}")
+        print(f"[!] Error in AI search: {e}")
+        import traceback
         traceback.print_exc()
+        
         return jsonify({
             "success": False,
-            "error": f"Search failed: {str(e)}",
-            "query": query if 'query' in locals() else "Unknown"
+            "error": f"Search failed: {str(e)}"
         }), 500
 
 
+# Add new endpoint for manual CVE verification
+@app.route('/api/verify_cve', methods=['POST'])
+def api_verify_cve():
+    """
+    Manually verify a CVE ID across multiple sources
+    """
+    data = request.get_json()
+    cve_id = data.get('cve_id', '').strip().upper()
+    
+    if not cve_id or not cve_id.startswith('CVE-'):
+        return jsonify({
+            "success": False,
+            "error": "Invalid CVE ID format"
+        }), 400
+    
+    try:
+        verifier = CVEVerifier()
+        result = verifier.verify_cve_exists(cve_id)
+        
+        # Add human-readable summary
+        result['summary'] = format_verification_report(
+            result.get('verified_sources', []),
+            result.get('confidence', 0)
+        )
+        
+        return jsonify({
+            "success": True,
+            "verification": result
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+# Add endpoint to check verification configuration
+@app.route('/api/verification_config')
+def api_verification_config():
+    """
+    Get current verification configuration
+    """
+    from verification_config import (
+        TIER1_SOURCES,
+        TIER2_SOURCES,
+        TIER3_SOURCES,
+        VERIFICATION_RULES
+    )
+    
+    return jsonify({
+        "tier1_sources": len(TIER1_SOURCES),
+        "tier2_sources": len(TIER2_SOURCES),
+        "tier3_sources": len(TIER3_SOURCES),
+        "rules": VERIFICATION_RULES,
+        "tier1_list": list(TIER1_SOURCES.keys()),
+        "description": "Multi-tier verification system to prevent LLM hallucinations"
+    })
+
+
+# Update the CVE details endpoint
 @app.route('/api/cve_details', methods=['POST'])
 def api_cve_details():
     """
-    Get detailed information about a specific CVE using web search and scraping.
-    This uses real-time web data from NVD, CISA, and other sources.
+    Get detailed information about a VERIFIED CVE
     """
+    data = request.get_json()
+    cve_id = data.get('cve_id', '').strip().upper()
+    
+    if not cve_id or not cve_id.startswith('CVE-'):
+        return jsonify({
+            "success": False,
+            "error": "Please provide a valid CVE ID"
+        }), 400
+    
+    print(f"[*] Fetching verified details for: {cve_id}")
+    
     try:
-        data = request.get_json()
-        cve_id = data.get('cve_id', '').strip()
+        # First verify the CVE exists
+        verifier = CVEVerifier()
+        verification = verifier.verify_cve_exists(cve_id)
         
-        if not cve_id:
+        if not verification['exists']:
             return jsonify({
                 "success": False,
-                "error": "Please provide a CVE ID"
-            }), 400
+                "error": f"CVE not verified: {verification['reason']}",
+                "verification": verification
+            }), 404
         
-        print(f"\n{'='*60}")
-        print(f"[🔍] CVE Details Request: {cve_id}")
-        print(f"{'='*60}")
-        
-        # Use the fixed search function
+        # Get detailed information
         result = search_vulnerability_details(cve_id)
         
-        if result.get('success'):
-            print(f"[✅] CVE details retrieved successfully")
-        else:
-            print(f"[❌] CVE details failed: {result.get('error', 'Unknown error')}")
+        # Add verification info
+        result['verification'] = verification
+        result['verification_summary'] = format_verification_report(
+            verification.get('verified_sources', []),
+            verification.get('confidence', 0)
+        )
         
         return jsonify(result)
         
     except Exception as e:
-        print(f"[❌] API Error: {e}")
-        traceback.print_exc()
+        print(f"[!] Error fetching CVE details: {e}")
         return jsonify({
             "success": False,
-            "error": f"Failed to fetch details: {str(e)}",
-            "cve_id": cve_id if 'cve_id' in locals() else "Unknown"
+            "error": f"Failed to fetch details: {str(e)}"
         }), 500
 
 
