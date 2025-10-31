@@ -38,7 +38,7 @@ def search_vulnerabilities_with_ai(query: str) -> dict:
     """
     try:
         print(f"🔍 Searching for LATEST vulnerabilities: {query}")
-        print("⚠️  All results will be verified against multiple authoritative sources")
+        print("⚠️ All results will be verified against multiple authoritative sources")
         
         llm = create_search_agent()
         
@@ -100,12 +100,12 @@ Return ONLY a JSON array with vulnerabilities:
 ]
 
 **STRICT RULES:**
-- âœ… INCLUDE any CVE-{current_year}- found on vendor pages (even without exact date)
-- âœ… INCLUDE CVE-{current_year-1}- if found in {current_year} advisories
-- âœ… Prioritize CVEs from vendor's official security bulletin
-- âœ… Include CVEs from quarterly patch updates (CPU, PSU, etc.)
-- âŒ EXCLUDE CVEs from {current_year-2} ({current_year-2}) or earlier
-- âŒ EXCLUDE CVEs without vendor confirmation
+- ✅ INCLUDE any CVE-{current_year}- found on vendor pages (even without exact date)
+- ✅ INCLUDE CVE-{current_year-1}- if found in {current_year} advisories
+- ✅ Prioritize CVEs from vendor's official security bulletin
+- ✅ Include CVEs from quarterly patch updates (CPU, PSU, etc.)
+- ❌ EXCLUDE CVEs from {current_year-2} ({current_year-2}) or earlier
+- ❌ EXCLUDE CVEs without vendor confirmation
 
 **VERIFICATION:**
 - Every CVE MUST be from a vendor security page OR nvd.nist.gov
@@ -128,7 +128,7 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             if not isinstance(vulnerabilities, list):
                 vulnerabilities = [vulnerabilities] if isinstance(vulnerabilities, dict) else []
         except json.JSONDecodeError as e:
-            print(f"⚠️  JSON parsing failed: {e}")
+            print(f"⚠️ JSON parsing failed: {e}")
             vulnerabilities = []
         
         print(f"📥 LLM returned {len(vulnerabilities)} potential vulnerabilities")
@@ -139,8 +139,8 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
         
         # Filter out hallucinations
         verified_vulns = validator.filter_hallucinated_vulnerabilities(vulnerabilities)
-        # === STEP C: Fallback to local (scraped) dashboard data if no verified results found ===
-                # === PRIORITY SORTING: prioritize current-year CVEs ===
+        
+        # === PRIORITY SORTING: prioritize current-year CVEs ===
         current_year_str = f"CVE-{current_year}-"
         prev_year_str = f"CVE-{current_year-1}-"
 
@@ -162,7 +162,7 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
         )
 
         if not verified_vulns:
-            print("⚠️ No verified vulnerabilities from web-checks — falling back to local dashboard data.")
+            print("⚠️ No verified vulnerabilities from web-checks – falling back to local dashboard data.")
             try:
                 if os.path.exists(JSON_FILE):
                     with open(JSON_FILE, "r", encoding="utf-8") as f:
@@ -194,13 +194,6 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             except Exception as e:
                 print(f"⚠️ Fallback read error: {e}")
         
-        # Add exploit information only for verified CVEs
-        for vuln in verified_vulns:
-            cve_id = vuln.get('cve_id')
-            if cve_id and cve_id.startswith('CVE-'):
-                print(f"🔍 Searching exploits for verified CVE: {cve_id}")
-                vuln['exploits'] = search_exploits_for_cve(cve_id)
-        
         # Sort by verification confidence and severity
         verified_vulns.sort(
             key=lambda x: (
@@ -209,6 +202,7 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             ),
             reverse=True
         )
+        
         # Limit to 30 most relevant results
         verified_vulns = verified_vulns[:30]
 
@@ -235,81 +229,6 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             "vulnerabilities": [],
             "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
         }
-
-
-def search_exploits_for_cve(cve_id: str) -> list:
-    """
-    Search for exploits with verification
-    """
-    try:
-        print(f"🔍 Searching exploits for {cve_id}")
-        
-        llm = create_search_agent()
-        
-        exploit_prompt = f"""Search for PUBLIC exploits for {cve_id}.
-
-**ONLY search these verified sources:**
-- exploit-db.com
-- github.com (public repositories)
-- packetstormsecurity.com
-- NVD references section
-
-For each exploit found, you MUST provide:
-- Exact URL to the exploit code
-- Source name (Exploit-DB, GitHub, etc.)
-- Brief description
-
-Return JSON array:
-[
-  {{
-    "exploit_title": "Title",
-    "exploit_type": "Remote Code Execution/Local/DoS",
-    "platform": "Linux/Windows/Multiple",
-    "availability": "Public PoC/Metasploit Module",
-    "exploit_url": "EXACT URL (REQUIRED)",
-    "maturity": "PoC/Functional",
-    "description": "What it does"
-  }}
-]
-
-If you cannot find verified exploits with URLs, return empty array: []
-Return ONLY JSON - no markdown."""
-
-        response = llm.invoke(exploit_prompt)
-        content = clean_json_response(response.content.strip())
-        
-        try:
-            exploits = json.loads(content)
-            if not isinstance(exploits, list):
-                exploits = []
-            
-            # Verify exploit URLs are real
-            verified_exploits = []
-            for exploit in exploits:
-                url = exploit.get('exploit_url', '').strip()
-                
-                # Only keep exploits with valid URLs
-                if url and url.startswith('http'):
-                    # Quick URL validation (don't actually fetch, too slow)
-                    if any(domain in url.lower() for domain in [
-                        'exploit-db.com',
-                        'github.com',
-                        'packetstormsecurity.com',
-                        'nvd.nist.gov',
-                        'rapid7.com',
-                        'metasploit.com'
-                    ]):
-                        verified_exploits.append(exploit)
-                        print(f"  ✅ Verified exploit: {exploit.get('exploit_title')}")
-            
-            return verified_exploits
-            
-        except json.JSONDecodeError:
-            return []
-            
-    except Exception as e:
-        print(f"⚠️  Exploit search failed: {e}")
-        return []
 
 
 def clean_json_response(content: str) -> str:

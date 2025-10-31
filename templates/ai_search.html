@@ -313,117 +313,6 @@
             border-radius: 5px;
         }
 
-        /* NEW: Exploits Section Styles */
-        .exploits-section {
-            margin-top: 20px;
-            padding: 20px;
-            background: #fff3cd;
-            border-left: 4px solid #ff6b6b;
-            border-radius: 8px;
-        }
-
-        .exploits-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .exploits-header h4 {
-            font-size: 1.1em;
-            color: #721c24;
-            margin: 0;
-        }
-
-        .exploits-badge {
-            padding: 4px 10px;
-            background: #ff6b6b;
-            color: white;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .no-exploits {
-            color: #28a745;
-            font-weight: 500;
-            font-style: italic;
-        }
-
-        .exploit-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ffc107;
-        }
-
-        .exploit-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .exploit-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1em;
-        }
-
-        .exploit-meta {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-
-        .exploit-tag {
-            padding: 4px 10px;
-            background: #e9ecef;
-            border-radius: 6px;
-            font-size: 0.85em;
-            color: #495057;
-            font-weight: 500;
-        }
-
-        .exploit-tag.type {
-            background: #ffc107;
-            color: #333;
-        }
-
-        .exploit-tag.platform {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .exploit-tag.maturity {
-            background: #6c757d;
-            color: white;
-        }
-
-        .exploit-description {
-            color: #555;
-            font-size: 0.9em;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .exploit-link {
-            display: inline-block;
-            padding: 6px 14px;
-            background: #dc3545;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .exploit-link:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
         .vuln-footer {
             display: flex;
             justify-content: space-between;
@@ -491,7 +380,7 @@
         .error-message.active {
             display: block;
         }
-         /* NEW: Verification badge styles */
+
         .verification-badge {
             display: inline-flex;
             align-items: center;
@@ -587,12 +476,12 @@
         .warning-icon {
             font-size: 1.5em;
         }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 2em; }
             .search-box { flex-direction: column; }
             .vuln-header { flex-direction: column; }
             .vuln-info { grid-template-columns: 1fr; }
-            .exploit-meta { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
@@ -603,13 +492,15 @@
             <p class="subtitle">Powered by Gemini AI with Real-Time Web Search</p>
             <a href="/dashboard" class="back-btn">[←] Back to Dashboard</a>
         </div>
-         <div class="warning-banner">
+
+        <div class="warning-banner">
             <span class="warning-icon">🛡️</span>
             <div>
                 <strong>Verification Enabled:</strong> All results are verified against NVD, MITRE, CISA, and other authoritative sources. 
                 Only vulnerabilities confirmed by at least 2 independent sources are displayed.
             </div>
         </div>
+
         <div class="search-card">
             <div class="search-box">
                 <input 
@@ -636,26 +527,26 @@
 
         <div class="error-message" id="errorMessage"></div>
 
-            <div id="statsContainer" style="display: none;">
-                <div class="stats-banner" id="statsBanner"></div>
-            </div>
-
-            <div class="loading-container" id="loadingContainer">
-                <div class="loader"></div>
-                <p class="loading-text">🔍 Searching and verifying vulnerabilities...</p>
-                <p style="color: #666; margin-top: 10px; font-size: 0.9em;">
-                    This may take 15-45 seconds as we verify each result
-                </p>
-            </div>
-
-            <div class="results-container" id="resultsContainer">
-                <div class="results-header">
-                    <h2 id="resultsTitle">Search Results</h2>
-                    <p class="results-meta" id="resultsMeta"></p>
-                </div>
-                <div id="vulnerabilitiesList"></div>
-            </div>
+        <div id="statsContainer" style="display: none;">
+            <div class="stats-banner" id="statsBanner"></div>
         </div>
+
+        <div class="loading-container" id="loadingContainer">
+            <div class="loader"></div>
+            <p class="loading-text">🔍 Searching and verifying vulnerabilities...</p>
+            <p style="color: #666; margin-top: 10px; font-size: 0.9em;">
+                This may take 15-45 seconds as we verify each result
+            </p>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <h2 id="resultsTitle">Search Results</h2>
+                <p class="results-meta" id="resultsMeta"></p>
+            </div>
+            <div id="vulnerabilitiesList"></div>
+        </div>
+    </div>
 
     <script>
         let currentQuery = '';
@@ -665,199 +556,6 @@
             searchVulnerabilities();
         }
 
-        async function searchVulnerabilities() {
-            const query = document.getElementById('searchInput').value.trim();
-            
-            if (!query) {
-                showError('Please enter a software or organization name');
-                return;
-            }
-
-            currentQuery = query;
-
-            // Hide previous results and errors
-            hideError();
-            document.getElementById('resultsContainer').classList.remove('active');
-            
-            // Show loading
-            document.getElementById('loadingContainer').classList.add('active');
-            
-            // Disable search button
-            const searchBtn = document.getElementById('searchBtn');
-            searchBtn.disabled = true;
-            searchBtn.textContent = 'Searching...';
-
-            try {
-                const response = await fetch('/api/ai_search', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ query: query })
-                });
-
-                const data = await response.json();
-
-                // Hide loading
-                document.getElementById('loadingContainer').classList.remove('active');
-
-                if (!data.success) {
-                    showError(data.error || 'Search failed. Please try again.');
-                    return;
-                }
-
-                displayResults(data);
-
-            } catch (error) {
-                console.error('Search error:', error);
-                document.getElementById('loadingContainer').classList.remove('active');
-                showError('An error occurred while searching. Please try again.');
-            } finally {
-                // Re-enable search button
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Search Vulnerabilities';
-            }
-        }
-
-        function displayResults(data) {
-            const resultsContainer = document.getElementById('resultsContainer');
-            const vulnerabilitiesList = document.getElementById('vulnerabilitiesList');
-            
-            // Update header
-            document.getElementById('resultsTitle').textContent = `Results for "${data.query}"`;
-            document.getElementById('resultsMeta').textContent = 
-                `Found ${data.total_found} vulnerabilities | Last updated: ${data.timestamp}`;
-
-            // Clear previous results
-            vulnerabilitiesList.innerHTML = '';
-
-            if (data.vulnerabilities.length === 0) {
-                vulnerabilitiesList.innerHTML = `
-                    <div class="no-results">
-                        <h2>[!] No Vulnerabilities Found</h2>
-                        <p>No recent vulnerabilities were found for "${data.query}".</p>
-                        <p style="margin-top: 10px;">Try searching for a different software or organization.</p>
-                    </div>
-                `;
-            } else {
-                // Display each vulnerability
-                data.vulnerabilities.forEach((vuln, index) => {
-                    const card = createVulnerabilityCard(vuln, index);
-                    vulnerabilitiesList.innerHTML += card;
-                });
-            }
-
-            // Show results
-            resultsContainer.classList.add('active');
-            
-            // Smooth scroll to results
-            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function createVulnerabilityCard(vuln, index) {
-            const severity = (vuln.severity || 'Unknown').toLowerCase();
-            const cveId = vuln.cve_id || 'N/A';
-            const title = vuln.title || 'Untitled Vulnerability';
-            const description = vuln.description || 'No description available.';
-            const cvssScore = vuln.cvss_score ? `<span class="cvss-score">${vuln.cvss_score}</span>` : 'N/A';
-            const affectedProduct = vuln.affected_product || 'Unknown';
-            const dateDisclosed = vuln.date_disclosed || 'Unknown';
-            const exploitStatus = vuln.exploitation_status || 'Unknown';
-            const sourceUrl = vuln.source_url;
-            const exploits = vuln.exploits || [];
-
-            // Create exploits section HTML
-            let exploitsHTML = '';
-            if (exploits.length > 0) {
-                exploitsHTML = `
-                    <div class="exploits-section">
-                        <div class="exploits-header">
-                            <h4>Available Exploits</h4>
-                            <span class="exploits-badge">${exploits.length} Found</span>
-                        </div>
-                        ${exploits.map(exploit => `
-                            <div class="exploit-item">
-                                <div class="exploit-title">${exploit.exploit_title}</div>
-                                <div class="exploit-meta">
-                                    <span class="exploit-tag type">${exploit.exploit_type}</span>
-                                    <span class="exploit-tag platform">Platform: ${exploit.platform}</span>
-                                    <span class="exploit-tag maturity">Maturity: ${exploit.maturity}</span>
-                                    <span class="exploit-tag">${exploit.availability}</span>
-                                </div>
-                                <div class="exploit-description">${exploit.description}</div>
-                                ${exploit.exploit_url ? `<a href="${exploit.exploit_url}" target="_blank" class="exploit-link">View Exploit Code</a>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } else {
-                exploitsHTML = `
-                    <div class="exploits-section">
-                        <div class="exploits-header">
-                            <h4>Exploit Status</h4>
-                        </div>
-                        <p class="no-exploits">No public exploits found for this vulnerability</p>
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="vulnerability-card" style="animation-delay: ${index * 0.1}s">
-                    <div class="vuln-header">
-                        <div class="vuln-id">${cveId}</div>
-                        <div class="severity-badge severity-${severity}">${vuln.severity || 'Unknown'}</div>
-                    </div>
-                    
-                    <h3 class="vuln-title">${title}</h3>
-                    
-                    <div class="vuln-info">
-                        <div class="info-item">
-                            <span class="info-label">CVSS Score</span>
-                            <span class="info-value">${cvssScore}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Affected Product</span>
-                            <span class="info-value">${affectedProduct}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Date Disclosed</span>
-                            <span class="info-value">${dateDisclosed}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="vuln-description">
-                        <strong>Description:</strong><br>
-                        ${description}
-                    </div>
-                    
-                    ${exploitsHTML}
-                    
-                    <div class="vuln-footer">
-                        <div class="exploitation-status">
-                            <strong>Status:</strong> ${exploitStatus}
-                        </div>
-                        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" class="source-link">[↗] View Source</a>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = `Error: ${message}`;
-            errorDiv.classList.add('active');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                hideError();
-            }, 5000);
-        }
-
-        function hideError() {
-            document.getElementById('errorMessage').classList.remove('active');
-        }
         async function searchVulnerabilities() {
             const query = document.getElementById('searchInput').value.trim();
             
@@ -911,7 +609,7 @@
             // Update header
             document.getElementById('resultsTitle').textContent = `Verified Results for "${data.query}"`;
             
-            // NEW: Show verification statistics
+            // Show verification statistics
             if (data.verification_stats) {
                 const stats = data.verification_stats;
                 document.getElementById('statsContainer').style.display = 'block';
@@ -971,7 +669,7 @@
             const exploitStatus = vuln.exploitation_status || 'Unknown';
             const sourceUrl = vuln.source_url;
             
-            // NEW: Verification info
+            // Verification info
             const verification = vuln.verification || {};
             const confidence = verification.confidence || 0;
             const verifiedSources = verification.verified_sources || [];
@@ -999,12 +697,10 @@
                     
                     <h3 class="vuln-title">${title}</h3>
                     
-                    <!-- NEW: Verification Badge -->
                     <div class="verification-badge ${verificationClass}">
                         ${verificationBadge} (${confidence}%)
                     </div>
                     
-                    <!-- NEW: Verification Details -->
                     ${verifiedSources.length > 0 ? `
                     <div class="verification-details">
                         <strong>✅ Verified by:</strong>
@@ -1036,15 +732,6 @@
                         ${description}
                     </div>
                     
-                    ${vuln.exploits && vuln.exploits.length > 0 ? `
-                    <div class="vuln-description" style="background: #fff3cd; border-left-color: #ffc107;">
-                        <strong>⚠️ Public Exploits Available:</strong><br>
-                        ${vuln.exploits.map(exp => 
-                            `• ${exp.exploit_title} - <a href="${exp.exploit_url}" target="_blank">View Exploit</a>`
-                        ).join('<br>')}
-                    </div>
-                    ` : ''}
-                    
                     <div class="vuln-footer">
                         <div class="exploitation-status">
                             <strong>Status:</strong> ${exploitStatus}
@@ -1068,6 +755,7 @@
         function hideError() {
             document.getElementById('errorMessage').classList.remove('active');
         }
+
         // Focus on input on page load
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').focus();
