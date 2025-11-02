@@ -1,13 +1,13 @@
 {
   "type": "bundle",
-  "id": "bundle--85e0d5e9-aaa2-49c1-b7b6-190d32023f92",
+  "id": "bundle--ed09410d-efc8-4dfd-8b69-4ccac66b966d",
   "objects": [
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--7e9b3a1a-9b1c-4c8a-b3a2-7b8a9d1e3f4a",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "vulnerability--6093202a-5815-4225-b54e-577413616674",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "name": "CVE-2025-20333",
       "description": "Cisco ASA/FTD VPN Web Server Buffer Overflow",
       "external_references": [
@@ -20,14 +20,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--a8b7c6d5-4e3f-4a2b-9c1a-8e7d6f5c4b3a",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "Cisco ASA/FTD Exploit",
-      "description": "Exploitation pattern for CVE-2025-20333",
-      "pattern": "[process:command_line LIKE '%/CSCOE/%']",
+      "id": "indicator--7740579d-9c97-4157-a486-7a0447646963",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "Exploit indicator for CVE-2025-20333",
+      "description": "Detects exploitation of the Cisco ASA/FTD VPN Web Server Buffer Overflow",
+      "pattern": "[file:name LIKE '%.js']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:22.000Z",
+      "valid_from": "2025-11-02T08:06:57.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -35,21 +35,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--c9d8e7f6-5a4b-4c3d-8e2a-7d6c5b4a3f2e",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "relationship--00706812-862c-466d-88f3-63009b66293d",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--a8b7c6d5-4e3f-4a2b-9c1a-8e7d6f5c4b3a",
-      "target_ref": "vulnerability--7e9b3a1a-9b1c-4c8a-b3a2-7b8a9d1e3f4a"
+      "source_ref": "indicator--7740579d-9c97-4157-a486-7a0447646963",
+      "target_ref": "vulnerability--6093202a-5815-4225-b54e-577413616674"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--1b2c3d4e-5f6a-4b8c-9d0e-8a7b6c5d4e3f",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "vulnerability--04418028-5506-4501-964a-8844391d2643",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "name": "VULN-005",
-      "description": "Motex LANSCOPE Endpoint Manager Improper Verification",
+      "description": "Microsoft WSUS Deserialization of Untrusted Data",
       "external_references": [
         {
           "source_name": "internal",
@@ -60,14 +60,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--f3e2d1c0-a9b8-4c7d-8e6f-5a4b3c2d1e0f",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "LANSCOPE Exploit",
-      "description": "Exploitation pattern for VULN-005",
-      "pattern": "[file:path LIKE '%LANSCOPE%']",
+      "id": "indicator--8564828c-7c56-461e-b369-702505964767",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "Exploit indicator for VULN-005",
+      "description": "Detects exploitation of the Microsoft WSUS Deserialization vulnerability",
+      "pattern": "[process:command_line LIKE '%/wsuscontent/%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:22.000Z",
+      "valid_from": "2025-11-02T08:06:57.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -75,21 +75,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--a4b3c2d1-e0f9-4a8b-9c7d-6e5f4a3b2c1d",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "relationship--73106081-169f-4639-952c-30553917e62d",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--f3e2d1c0-a9b8-4c7d-8e6f-5a4b3c2d1e0f",
-      "target_ref": "vulnerability--1b2c3d4e-5f6a-4b8c-9d0e-8a7b6c5d4e3f"
+      "source_ref": "indicator--8564828c-7c56-461e-b369-702505964767",
+      "target_ref": "vulnerability--04418028-5506-4501-964a-8844391d2643"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--8c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "vulnerability--2a46277f-1416-4a7a-914a-73626751985e",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "name": "VULN-006",
-      "description": "Apple Multiple Products Unspecified Vulnerability",
+      "description": "Motex LANSCOPE Endpoint Manager Improper Verification",
       "external_references": [
         {
           "source_name": "internal",
@@ -100,14 +100,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--b5a4c3d2-e1f0-4a9b-8c7d-6e5f4a3b2c1d",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "Apple Exploit",
-      "description": "Exploitation pattern for VULN-006",
-      "pattern": "[process:name = 'malicious_process']",
+      "id": "indicator--8556491f-1415-4d21-8538-327853482343",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "Exploit indicator for VULN-006",
+      "description": "Detects exploitation of the Motex LANSCOPE Endpoint Manager vulnerability",
+      "pattern": "[file:path LIKE '%LANSCOPE%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:22.000Z",
+      "valid_from": "2025-11-02T08:06:57.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -115,141 +115,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--d6e5f4a3-b2c1-4d0e-9f8a-7b6c5d4e3f2a",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
+      "id": "relationship--46219493-473b-4166-8567-97462e047000",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--b5a4c3d2-e1f0-4a9b-8c7d-6e5f4a3b2c1d",
-      "target_ref": "vulnerability--8c9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f"
+      "source_ref": "indicator--8556491f-1415-4d21-8538-327853482343",
+      "target_ref": "vulnerability--2a46277f-1416-4a7a-914a-73626751985e"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--2f3e4d5c-6b7a-4c9d-8e1f-0a2b3c4d5e6f",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "VULN-010",
-      "description": "Adobe Experience Manager Forms Code Execution",
-      "external_references": [
-        {
-          "source_name": "internal",
-          "external_id": "VULN-010"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--9a8b7c6d-5e4f-4a3b-9c2d-1e0f9a8b7c6d",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "Adobe AEM Exploit",
-      "description": "Exploitation pattern for VULN-010",
-      "pattern": "[file:name LIKE '%/AEMForms/%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:22.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--3b2c1d0e-f9a8-4c7d-8e6f-5a4b3c2d1e0f",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--9a8b7c6d-5e4f-4a3b-9c2d-1e0f9a8b7c6d",
-      "target_ref": "vulnerability--2f3e4d5c-6b7a-4c9d-8e1f-0a2b3c4d5e6f"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "VDB-244483",
-      "description": "DiscordSailv2 Improper Access Controls",
-      "external_references": [
-        {
-          "source_name": "vuldb",
-          "external_id": "VDB-244483"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--5e4f3a2b-1c0d-4e3f-9a8b-7c6d5e4f3a2b",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "name": "DiscordSailv2 Exploit",
-      "description": "Exploitation pattern for VDB-244483",
-      "pattern": "[url:value LIKE '%DiscordSailv2%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:22.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--6f7a8b9c-0d1e-4f2a-3b4c-5d6e7f8a9b0c",
-      "created": "2025-10-30T06:29:22.000Z",
-      "modified": "2025-10-30T06:29:22.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--5e4f3a2b-1c0d-4e3f-9a8b-7c6d5e4f3a2b",
-      "target_ref": "vulnerability--4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--98a738e2-8217-4c08-a37d-a8e19b667321",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "DiscordSailv2 Tag Handler Improper Access Controls",
-      "description": "Improper access controls in DiscordSailv2 Tag Handler.",
-      "external_references": [
-        {
-          "source_name": "VDB",
-          "external_id": "VDB-244484"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--3b9c2a51-1e76-4a8d-b5f0-7a6d8e4f1c32",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "DiscordSailv2 Exploit Indicator",
-      "description": "Detects exploitation attempts.",
-      "pattern": "[process:command_line LIKE '%DiscordSailv2%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:43.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--1c5e7d34-6b8a-4e2f-9d1a-8b3c4e5f2a6b",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--3b9c2a51-1e76-4a8d-b5f0-7a6d8e4f1c32",
-      "target_ref": "vulnerability--98a738e2-8217-4c08-a37d-a8e19b667321"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--7b2a9c1d-3e4f-4a6b-9c8d-2e7a1b6c8d9e",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Kentico Xperience CMS Authentication Bypass",
-      "description": "Authentication bypass vulnerability in Kentico Xperience CMS.",
+      "id": "vulnerability--9f723588-904e-4393-a186-732375918759",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "VULN-007",
+      "description": "Apple Multiple Products Unspecified JavaScriptCore Vulnerability",
       "external_references": [
         {
           "source_name": "internal",
@@ -260,14 +140,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--a4c3b2e0-5d6e-4f8a-8b9c-7e8d9a0b1c2f",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Kentico Auth Bypass Indicator",
-      "description": "Detects authentication bypass attempts.",
-      "pattern": "[network-traffic:dst_port = 80 AND network-traffic:src_port = 443]",
+      "id": "indicator--41601941-9744-4296-9047-023548578226",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "Exploit indicator for VULN-007",
+      "description": "Detects exploitation of the Apple JavaScriptCore vulnerability",
+      "pattern": "[process:name = 'JavaScriptCore']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:43.000Z",
+      "valid_from": "2025-11-02T08:06:57.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -275,24 +155,104 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--5d1e3f2a-7c8b-4a9d-9e0f-8a7b6c9d8e0a",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
+      "id": "relationship--1791977c-6663-4687-8155-91337149630e",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--a4c3b2e0-5d6e-4f8a-8b9c-7e8d9a0b1c2f",
-      "target_ref": "vulnerability--7b2a9c1d-3e4f-4a6b-9c8d-2e7a1b6c8d9e"
+      "source_ref": "indicator--41601941-9744-4296-9047-023548578226",
+      "target_ref": "vulnerability--9f723588-904e-4393-a186-732375918759"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--2d9b8a7c-4f6e-4b5d-8a2c-3e1a2b3c4d5e",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Microsoft Windows SMB Client Improper Access Control",
-      "description": "Improper access control in Microsoft Windows SMB Client.",
+      "id": "vulnerability--6607646a-9d80-4769-928e-97841080704b",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "CVE-2025-20362",
+      "description": "Cisco ASA/FTD VPN Web Server Vulnerability",
       "external_references": [
         {
-          "source_name": "internal",
+          "source_name": "cve",
+          "external_id": "CVE-2025-20362"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--946301c3-5671-439f-8088-523698054171",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "name": "Exploit indicator for CVE-2025-20362",
+      "description": "Detects exploitation of the Cisco ASA/FTD VPN Web Server Vulnerability",
+      "pattern": "[network-traffic:dst_port = 443 AND network-traffic:protocols[*] = 'https']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:06:57.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--87229294-780c-4408-964c-781575524553",
+      "created": "2025-11-02T08:06:57.000Z",
+      "modified": "2025-11-02T08:06:57.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--946301c3-5671-439f-8088-523698054171",
+      "target_ref": "vulnerability--6607646a-9d80-4769-928e-97841080704b"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--4e9b2a5e-9a7a-4b2b-9b2b-2e2e2e2e2e2e",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "CVE-2025-48384",
+      "description": "VMware Aria Operations/Tools Privilege Escalation",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2025-48384"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--7b1c3d4a-5e6f-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "Aria Operations Exploit",
+      "description": "Exploitation pattern for CVE-2025-48384",
+      "pattern": "[file:name = 'exploit.sh']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:07:17.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--9a8b7c6d-4e3f-4a2b-8c1d-2e9f8a7b6c5d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--7b1c3d4a-5e6f-4a7b-8c9d-3e5f7a9b1c3d",
+      "target_ref": "vulnerability--4e9b2a5e-9a7a-4b2b-9b2b-2e2e2e2e2e2e"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--1a2b3c4d-5e6f-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "VULN-008",
+      "description": "Kentico Xperience CMS Authentication Bypass",
+      "external_references": [
+        {
+          "source_name": "vendor advisory",
           "external_id": "VULN-008"
         }
       ]
@@ -300,14 +260,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--8e5c4b3a-2f7d-4e6c-9d8b-1a7e6f5d4c3b",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Windows SMB Access Indicator",
-      "description": "Detects unauthorized SMB access.",
-      "pattern": "[network-traffic:protocol = 'smb']",
+      "id": "indicator--8c9d3e5f-4a7b-5e6f-1a2b-3c4d7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "Kentico Auth Bypass Attempt",
+      "description": "Attempt to bypass authentication in Kentico CMS",
+      "pattern": "[network-traffic:dst_port = 80 and url LIKE '%/bypass.aspx%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:43.000Z",
+      "valid_from": "2025-11-02T08:07:17.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -315,24 +275,24 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--4a1f0e9d-3b2c-4a1e-8f3d-2c1b0a9e8d7f",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
+      "id": "relationship--3c4d1a2b-5e6f-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--8e5c4b3a-2f7d-4e6c-9d8b-1a7e6f5d4c3b",
-      "target_ref": "vulnerability--2d9b8a7c-4f6e-4b5d-8a2c-3e1a2b3c4d5e"
+      "source_ref": "indicator--8c9d3e5f-4a7b-5e6f-1a2b-3c4d7a9b1c3d",
+      "target_ref": "vulnerability--1a2b3c4d-5e6f-4a7b-8c9d-3e5f7a9b1c3d"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--6c7b5a3d-5e9f-4a8b-9c4a-2b1a0e9d8c7b",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Oracle E-Business Suite SSRF",
-      "description": "Server-Side Request Forgery vulnerability in Oracle E-Business Suite.",
+      "id": "vulnerability--5e6f1a2b-3c4d-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "VULN-009",
+      "description": "Ivanti Avalanche Printer Device Service Local Privilege Escalation",
       "external_references": [
         {
-          "source_name": "internal",
+          "source_name": "vendor advisory",
           "external_id": "VULN-009"
         }
       ]
@@ -340,14 +300,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--9f6a5b4c-1d8e-4f7a-9b3c-2a1e0d9c8b5a",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Oracle EBS SSRF Indicator",
-      "description": "Detects SSRF attempts.",
-      "pattern": "[url:value LIKE '%oracle.com%']",
+      "id": "indicator--2b3c4d5e-6f1a-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "Avalanche Privilege Escalation",
+      "description": "Exploitation of Ivanti Avalanche Printer Device Service",
+      "pattern": "[process:name = 'printer_service.exe' AND process:command_line LIKE '%--escalate%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:43.000Z",
+      "valid_from": "2025-11-02T08:07:17.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -355,39 +315,39 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--3e8d7c6b-2a4f-4e1d-9c8a-5b3d2c1a4f7e",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
+      "id": "relationship--4d5e6f1a-2b3c-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--9f6a5b4c-1d8e-4f7a-9b3c-2a1e0d9c8b5a",
-      "target_ref": "vulnerability--6c7b5a3d-5e9f-4a8b-9c4a-2b1a0e9d8c7b"
+      "source_ref": "indicator--2b3c4d5e-6f1a-4a7b-8c9d-3e5f7a9b1c3d",
+      "target_ref": "vulnerability--5e6f1a2b-3c4d-4a7b-8c9d-3e5f7a9b1c3d"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--5a3b2c1d-4e6f-4b5a-8c7d-3e2a1b0c9d8e",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Magnesium-PHP Injection Vulnerability",
-      "description": "Injection vulnerability in Magnesium-PHP.",
+      "id": "vulnerability--6f1a2b3c-4d5e-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "VULN-010",
+      "description": "Insecure Inter-Process Communication Authentication Bypass",
       "external_references": [
         {
-          "source_name": "VDB",
-          "external_id": "VDB-244482"
+          "source_name": "vendor advisory",
+          "external_id": "VULN-010"
         }
       ]
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--1b4c3a2d-5f8e-4b7a-9c6d-2e3a0f1b9c4e",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
-      "name": "Magnesium-PHP Injection Indicator",
-      "description": "Detects injection attempts.",
-      "pattern": "[process:command_line LIKE '%magnesium-php%']",
+      "id": "indicator--3c4d5e6f-1a2b-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "IPC Bypass Attempt",
+      "description": "Attempt to bypass IPC authentication",
+      "pattern": "[process:command_line LIKE '%--bypass-auth%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:29:43.000Z",
+      "valid_from": "2025-11-02T08:07:17.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -395,61 +355,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--7d9e8c5b-3a1f-4e2d-9c8a-1b0e9d2c4f6a",
-      "created": "2025-10-30T06:29:43.000Z",
-      "modified": "2025-10-30T06:29:43.000Z",
+      "id": "relationship--5e6f3c4d-1a2b-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--1b4c3a2d-5f8e-4b7a-9c6d-2e3a0f1b9c4e",
-      "target_ref": "vulnerability--5a3b2c1d-4e6f-4b5a-8c7d-3e2a1b0c9d8e"
+      "source_ref": "indicator--3c4d5e6f-1a2b-4a7b-8c9d-3e5f7a9b1c3d",
+      "target_ref": "vulnerability--6f1a2b3c-4d5e-4a7b-8c9d-3e5f7a9b1c3d"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--95a242a5-3535-4468-a68d-031513892628",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "ColdBox Elixir Information Disclosure",
-      "description": "Information Disclosure in ColdBox Elixir 3.1.6",
-      "external_references": [
-        {
-          "source_name": "vdb",
-          "external_id": "VDB-244485"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--59569a26-a387-4158-91a8-88e790046445",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "ColdBox Elixir Exploit",
-      "description": "Detects potential exploitation attempts.",
-      "pattern": "[file:name LIKE '%elixir%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:07.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--9779325a-6251-4807-9269-216770061497",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--59569a26-a387-4158-91a8-88e790046445",
-      "target_ref": "vulnerability--95a242a5-3535-4468-a68d-031513892628"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--10311670-676f-4f9a-9393-58a098622931",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Unspecified Vulnerability Fixed in CPU (CVE-2025-61884)",
-      "description": "Unspecified vulnerability in Oracle on-premises products.",
+      "id": "vulnerability--7a9b1c3d-5e6f-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "CVE-2025-61884",
+      "description": "Unspecified Vulnerability Fixed in CPU",
       "external_references": [
         {
           "source_name": "cve",
@@ -460,14 +380,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--39741143-9986-4545-845a-209993973687",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Oracle CPU Vulnerability Indicator",
-      "description": "Detects potential exploitation attempts against Oracle CPU.",
-      "pattern": "[process:command_line LIKE '%oracle%']",
+      "id": "indicator--4d5e6f7a-9b1c-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
+      "name": "CPU Vulnerability Exploit",
+      "description": "Exploitation attempt against CPU vulnerability",
+      "pattern": "[process:command_line LIKE '%--cpu-exploit%']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:07.000Z",
+      "valid_from": "2025-11-02T08:07:17.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -475,21 +395,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--98841299-6d26-4997-8718-599817073334",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
+      "id": "relationship--6f7a9b1c-3d5e-4a7b-8c9d-3e5f7a9b1c3d",
+      "created": "2025-11-02T08:07:17.000Z",
+      "modified": "2025-11-02T08:07:17.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--39741143-9986-4545-845a-209993973687",
-      "target_ref": "vulnerability--10311670-676f-4f9a-9393-58a098622931"
+      "source_ref": "indicator--4d5e6f7a-9b1c-4a7b-8c9d-3e5f7a9b1c3d",
+      "target_ref": "vulnerability--7a9b1c3d-5e6f-4a7b-8c9d-3e5f7a9b1c3d"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--17508f9f-0853-4622-948e-5a813537617d",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Unspecified Vulnerability Fixed in CPU (CVE-2025-61882)",
-      "description": "Unspecified vulnerability in Oracle on-premises products.",
+      "id": "vulnerability--8c81381a-0169-4200-a439-5946685f8611",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2025-61882",
+      "description": "Unspecified vulnerability in Oracle Products CPU.",
       "external_references": [
         {
           "source_name": "cve",
@@ -500,14 +420,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--63507338-9351-4e99-8143-643025a75465",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Oracle CPU Vulnerability Indicator 2",
-      "description": "Detects potential exploitation attempts against Oracle CPU.",
-      "pattern": "[file:path LIKE '%oracle%']",
+      "id": "indicator--6034940a-1294-4931-9742-81339983092b",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2025-61882 Exploit",
+      "description": "Indicator for CVE-2025-61882 exploitation.",
+      "pattern": "[file:hashes.MD5 = 'd41d8cd98f00b204e9800998ecf8427e']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:07.000Z",
+      "valid_from": "2025-11-02T08:07:37.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -515,21 +435,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--99317335-1486-485a-851f-81693d900846",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
+      "id": "relationship--6781867b-506a-496c-9624-846212207243",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--63507338-9351-4e99-8143-643025a75465",
-      "target_ref": "vulnerability--17508f9f-0853-4622-948e-5a813537617d"
+      "source_ref": "indicator--6034940a-1294-4931-9742-81339983092b",
+      "target_ref": "vulnerability--8c81381a-0169-4200-a439-5946685f8611"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--4691286e-1381-480a-a09a-17666243387d",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Unspecified Vulnerability Fixed in CPU (CVE-2024-21287)",
-      "description": "Unspecified vulnerability in Oracle on-premises products.",
+      "id": "vulnerability--19971679-691e-4812-932b-259b6238b855",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2024-21287",
+      "description": "Unspecified vulnerability in Oracle Products CPU.",
       "external_references": [
         {
           "source_name": "cve",
@@ -540,14 +460,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--5334316d-922a-499b-8955-549913971215",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Oracle CPU Vulnerability Indicator 3",
-      "description": "Detects potential exploitation attempts against Oracle CPU.",
-      "pattern": "[network-traffic:dst_port = 1521]",
+      "id": "indicator--77020357-9986-4258-897a-4907368b6466",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2024-21287 Exploit",
+      "description": "Indicator for CVE-2024-21287 exploitation.",
+      "pattern": "[file:hashes.SHA256 = 'e5b7b9144c7439960a1965110c4921585e6892013a0969d79706103559097411']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:07.000Z",
+      "valid_from": "2025-11-02T08:07:37.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -555,21 +475,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--3324d80d-9844-4351-8644-809905279686",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
+      "id": "relationship--5814870d-6755-4613-9f29-730352459979",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--5334316d-922a-499b-8955-549913971215",
-      "target_ref": "vulnerability--4691286e-1381-480a-a09a-17666243387d"
+      "source_ref": "indicator--77020357-9986-4258-897a-4907368b6466",
+      "target_ref": "vulnerability--19971679-691e-4812-932b-259b6238b855"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--48188998-419f-4116-b29a-99490145795b",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Unspecified Vulnerability Fixed in CPU (CVE-2022-21500)",
-      "description": "Unspecified vulnerability in Oracle on-premises products.",
+      "id": "vulnerability--68587158-8999-473f-9c1d-10179079617b",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2022-21500",
+      "description": "Unspecified vulnerability in Oracle Products CPU.",
       "external_references": [
         {
           "source_name": "cve",
@@ -580,14 +500,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--5257545a-9528-4864-8265-679553431882",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
-      "name": "Oracle CPU Vulnerability Indicator 4",
-      "description": "Detects potential exploitation attempts against Oracle CPU.",
-      "pattern": "[process:name = 'java']",
+      "id": "indicator--31407661-6356-4607-8331-287588617911",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2022-21500 Exploit",
+      "description": "Indicator for CVE-2022-21500 exploitation.",
+      "pattern": "[process:name = 'malicious_process']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:07.000Z",
+      "valid_from": "2025-11-02T08:07:37.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -595,21 +515,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--4366253c-480b-4415-9435-358944713111",
-      "created": "2025-10-30T06:30:07.000Z",
-      "modified": "2025-10-30T06:30:07.000Z",
+      "id": "relationship--8184407d-416c-453d-9265-66569452288d",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--5257545a-9528-4864-8265-679553431882",
-      "target_ref": "vulnerability--48188998-419f-4116-b29a-99490145795b"
+      "source_ref": "indicator--31407661-6356-4607-8331-287588617911",
+      "target_ref": "vulnerability--68587158-8999-473f-9c1d-10179079617b"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--59942068-549a-4192-8695-61334292909e",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "vulnerability--73874877-8829-4550-8463-2f5946173256",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "name": "CVE-2021-44228",
-      "description": "Unspecified Vulnerability Fixed in CPU",
+      "description": "Unspecified vulnerability in Oracle Products CPU.",
       "external_references": [
         {
           "source_name": "cve",
@@ -620,14 +540,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--9605c38b-069f-463d-861b-402459662922",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "CVE-2021-44228 Indicator",
-      "description": "Indicator for CVE-2021-44228 exploitation",
-      "pattern": "[file:hashes.MD5 = 'd41d8cd98f00b204e9800998ecf8427e']",
+      "id": "indicator--06282845-367b-4770-8756-221892827085",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2021-44228 Exploit",
+      "description": "Indicator for CVE-2021-44228 exploitation.",
+      "pattern": "[network-traffic:dst_port = 1389]",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:26.000Z",
+      "valid_from": "2025-11-02T08:07:37.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -635,21 +555,21 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--2151155b-812e-4521-876f-958491978749",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "relationship--199d6704-7822-458e-b196-90543716171c",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--9605c38b-069f-463d-861b-402459662922",
-      "target_ref": "vulnerability--59942068-549a-4192-8695-61334292909e"
+      "source_ref": "indicator--06282845-367b-4770-8756-221892827085",
+      "target_ref": "vulnerability--73874877-8829-4550-8463-2f5946173256"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--13e54256-2565-4366-9700-913530431591",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "vulnerability--63303344-3864-4709-973d-f85499a9007b",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "name": "CVE-2020-14750",
-      "description": "Unspecified Vulnerability Fixed in CPU",
+      "description": "Unspecified vulnerability in Oracle Products CPU.",
       "external_references": [
         {
           "source_name": "cve",
@@ -660,14 +580,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--1458523f-991b-4f41-855b-274989888749",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "CVE-2020-14750 Indicator",
-      "description": "Indicator for CVE-2020-14750 exploitation",
-      "pattern": "[file:hashes.SHA256 = 'e5b7b7e9b0b7b7e9b0b7b7e9b0b7b7e9b0b7b7e9b0b7b7e9b0b7b7e9b0b7b7e9']",
+      "id": "indicator--54963279-5a24-436d-b448-02806536742c",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
+      "name": "CVE-2020-14750 Exploit",
+      "description": "Indicator for CVE-2020-14750 exploitation.",
+      "pattern": "[url:value LIKE '%/poc.txt']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:26.000Z",
+      "valid_from": "2025-11-02T08:07:37.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -675,24 +595,24 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--40858994-376e-4437-995a-6923e545050f",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "relationship--44993011-3871-450c-b97a-932938318057",
+      "created": "2025-11-02T08:07:37.000Z",
+      "modified": "2025-11-02T08:07:37.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--1458523f-991b-4f41-855b-274989888749",
-      "target_ref": "vulnerability--13e54256-2565-4366-9700-913530431591"
+      "source_ref": "indicator--54963279-5a24-436d-b448-02806536742c",
+      "target_ref": "vulnerability--63303344-3864-4709-973d-f85499a9007b"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--9b44264e-812c-4225-9999-579445611698",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-001",
-      "description": "Critical Patch Update - July 2025",
+      "id": "vulnerability--99a719c1-9133-481a-807f-29479796b95b",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "October 2025 CPU",
+      "description": "Vulnerability in October 2025 CPU.",
       "external_references": [
         {
-          "source_name": "internal",
+          "source_name": "vendor",
           "external_id": "VULN-001"
         }
       ]
@@ -700,14 +620,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--81138189-547b-4602-847d-118549567405",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-001 Indicator",
-      "description": "Indicator for VULN-001 exploitation",
-      "pattern": "[process:name = 'bad_process.exe']",
+      "id": "indicator--3412977a-2709-438d-961b-5865a5987753",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "October 2025 CPU Exploit",
+      "description": "Indicator for potential exploitation of October 2025 CPU vulnerability.",
+      "pattern": "[file:hashes.MD5 = 'd41d8cd98f00b204e9800998ecf8427e']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:26.000Z",
+      "valid_from": "2025-11-02T08:07:55.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -715,24 +635,24 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--5589856a-13b6-4991-9f37-4781b6219034",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "relationship--59974368-9018-412a-b466-79863100957c",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--81138189-547b-4602-847d-118549567405",
-      "target_ref": "vulnerability--9b44264e-812c-4225-9999-579445611698"
+      "source_ref": "indicator--3412977a-2709-438d-961b-5865a5987753",
+      "target_ref": "vulnerability--99a719c1-9133-481a-807f-29479796b95b"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--59939333-5266-4159-9088-871809589578",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-002",
-      "description": "Critical Patch Update - April 2025",
+      "id": "vulnerability--47798775-1791-4289-898e-66753472724f",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "July 2025 CPU",
+      "description": "Vulnerability in July 2025 CPU.",
       "external_references": [
         {
-          "source_name": "internal",
+          "source_name": "vendor",
           "external_id": "VULN-002"
         }
       ]
@@ -740,14 +660,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--2f8b9999-405b-4584-9e2e-876978235986",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-002 Indicator",
-      "description": "Indicator for VULN-002 exploitation",
-      "pattern": "[network-traffic:dst_port = 8080]",
+      "id": "indicator--28562178-9574-444e-951d-549061535292",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "July 2025 CPU Exploit",
+      "description": "Indicator for potential exploitation of July 2025 CPU vulnerability.",
+      "pattern": "[file:hashes.SHA256 = 'e5b7b7e954a547b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7e7b7']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:26.000Z",
+      "valid_from": "2025-11-02T08:07:55.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -755,24 +675,24 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--39629810-929e-4558-9863-080135494027",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "relationship--3893588f-4333-4027-966a-881505164774",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--2f8b9999-405b-4584-9e2e-876978235986",
-      "target_ref": "vulnerability--59939333-5266-4159-9088-871809589578"
+      "source_ref": "indicator--28562178-9574-444e-951d-549061535292",
+      "target_ref": "vulnerability--47798775-1791-4289-898e-66753472724f"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--99474893-9099-4909-9399-649949494949",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-003",
-      "description": "Critical Patch Update - January 2025",
+      "id": "vulnerability--54529912-7030-4004-960c-051131398827",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "April 2025 CPU",
+      "description": "Vulnerability in April 2025 CPU.",
       "external_references": [
         {
-          "source_name": "internal",
+          "source_name": "vendor",
           "external_id": "VULN-003"
         }
       ]
@@ -780,14 +700,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--11223344-5566-4477-8899-aabbccddeeff",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
-      "name": "VULN-003 Indicator",
-      "description": "Indicator for VULN-003 exploitation",
-      "pattern": "[file:path = '/tmp/evil.sh']",
+      "id": "indicator--77838584-2648-483b-a426-219765482971",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "April 2025 CPU Exploit",
+      "description": "Indicator for potential exploitation of April 2025 CPU vulnerability.",
+      "pattern": "[process:name = 'evil.exe']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:26.000Z",
+      "valid_from": "2025-11-02T08:07:55.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -795,24 +715,24 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--ffeeddcc-bbaa-9988-7766-554433221100",
-      "created": "2025-10-30T06:30:26.000Z",
-      "modified": "2025-10-30T06:30:26.000Z",
+      "id": "relationship--62168098-5094-4591-966d-394013178272",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--11223344-5566-4477-8899-aabbccddeeff",
-      "target_ref": "vulnerability--99474893-9099-4909-9399-649949494949"
+      "source_ref": "indicator--77838584-2648-483b-a426-219765482971",
+      "target_ref": "vulnerability--54529912-7030-4004-960c-051131398827"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--5040440b-e54c-4764-8373-13f360557142",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "Critical Patch Update - July 2024",
-      "description": "Critical Patch Update for Oracle on-premises products.",
+      "id": "vulnerability--53103635-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "January 2025 CPU",
+      "description": "Vulnerability in January 2025 CPU.",
       "external_references": [
         {
-          "source_name": "vendor advisory",
+          "source_name": "vendor",
           "external_id": "VULN-004"
         }
       ]
@@ -820,294 +740,14 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--856a8f85-8724-469a-b50a-912733154169",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "Oracle Exploit Activity",
-      "description": "Detection of exploit attempts targeting Oracle products.",
-      "pattern": "[process:command_line LIKE '%Oracle%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:45.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--45b8555b-5399-4904-882a-f45329365863",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--856a8f85-8724-469a-b50a-912733154169",
-      "target_ref": "vulnerability--5040440b-e54c-4764-8373-13f360557142"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--5532465d-6d84-4964-9057-156441364864",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "CVE-2025-6204",
-      "description": "Unspecified vulnerability reported.",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-6204"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--60794742-6296-412e-8353-532268637212",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "Generic Exploit Pattern",
-      "description": "Detection of generic exploit attempts.",
-      "pattern": "[process:command_line LIKE '%exploit%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:45.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--86988603-9333-4d9a-999b-508966762286",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--60794742-6296-412e-8353-532268637212",
-      "target_ref": "vulnerability--5532465d-6d84-4964-9057-156441364864"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--71858337-3333-4444-9999-222222222222",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "CVE-2025-6205",
-      "description": "Unspecified vulnerability reported.",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-6205"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--99999999-aaaa-bbbb-cccc-333333333333",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "Suspicious Network Activity",
-      "description": "Detects unusual network connections.",
-      "pattern": "[network-traffic:dst_port > 10000]",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:45.000Z",
-      "labels": [
-        "anomalous-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--11111111-dddd-eeee-ffff-444444444444",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--99999999-aaaa-bbbb-cccc-333333333333",
-      "target_ref": "vulnerability--71858337-3333-4444-9999-222222222222"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--22222222-5555-6666-7777-555555555555",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "CVE-2025-54236",
-      "description": "Unspecified vulnerability reported.",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-54236"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--33333333-7777-8888-9999-666666666666",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "File Modification Indicator",
-      "description": "Detects modification of critical system files.",
-      "pattern": "[file:modified > '2025-10-30T06:00:00.000Z']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:45.000Z",
-      "labels": [
-        "suspicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--44444444-9999-aaaa-bbbb-777777777777",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--33333333-7777-8888-9999-666666666666",
-      "target_ref": "vulnerability--22222222-5555-6666-7777-555555555555"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--55555555-bbbb-cccc-dddd-888888888888",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "CVE-2025-59287",
-      "description": "Unspecified vulnerability reported.",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-59287"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--66666666-dddd-eeee-ffff-999999999999",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "name": "Process Creation Indicator",
-      "description": "Detects creation of suspicious processes.",
-      "pattern": "[process:name LIKE '%suspicious%']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:30:45.000Z",
-      "labels": [
-        "suspicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--77777777-ffff-0000-1111-aaaaaaaaaaaa",
-      "created": "2025-10-30T06:30:45.000Z",
-      "modified": "2025-10-30T06:30:45.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--66666666-dddd-eeee-ffff-999999999999",
-      "target_ref": "vulnerability--55555555-bbbb-cccc-dddd-888888888888"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--e3a7b774-5b54-4f73-b4a7-316851483978",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-61932",
-      "description": "Unspecified Vulnerability",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-61932"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--62349e2a-472e-4256-8832-529185736409",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-61932 Indicator",
-      "description": "Exploit detected",
-      "pattern": "[file:hashes.MD5 = 'd41d8cd98f00b204e9800998ecf8427e']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:31:04.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--87208665-067f-4651-888d-113488628105",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--62349e2a-472e-4256-8832-529185736409",
-      "target_ref": "vulnerability--e3a7b774-5b54-4f73-b4a7-316851483978"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--3d163993-0907-4649-b46a-756781424499",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2022-48503",
-      "description": "Unspecified Vulnerability",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2022-48503"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--9872b56a-167b-4919-8979-009018035775",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2022-48503 Indicator",
-      "description": "Exploit detected",
-      "pattern": "[process:name = 'bad_process.exe']",
-      "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:31:04.000Z",
-      "labels": [
-        "malicious-activity"
-      ]
-    },
-    {
-      "type": "relationship",
-      "spec_version": "2.1",
-      "id": "relationship--0b7b8542-6017-407c-8093-7d5180619261",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "relationship_type": "indicates",
-      "source_ref": "indicator--9872b56a-167b-4919-8979-009018035775",
-      "target_ref": "vulnerability--3d163993-0907-4649-b46a-756781424499"
-    },
-    {
-      "type": "vulnerability",
-      "spec_version": "2.1",
-      "id": "vulnerability--93960921-4224-4861-b24a-877185776536",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-2746",
-      "description": "Unspecified Vulnerability",
-      "external_references": [
-        {
-          "source_name": "cve",
-          "external_id": "CVE-2025-2746"
-        }
-      ]
-    },
-    {
-      "type": "indicator",
-      "spec_version": "2.1",
-      "id": "indicator--6514597b-4197-499a-a143-286584976436",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-2746 Indicator",
-      "description": "Exploit detected",
+      "id": "indicator--62765697-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "January 2025 CPU Exploit",
+      "description": "Indicator for potential exploitation of January 2025 CPU vulnerability.",
       "pattern": "[network-traffic:dst_port = 8080]",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:31:04.000Z",
+      "valid_from": "2025-11-02T08:07:55.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -1115,39 +755,39 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--61928132-1972-417a-8835-a25533669353",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
+      "id": "relationship--73214746-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--6514597b-4197-499a-a143-286584976436",
-      "target_ref": "vulnerability--93960921-4224-4861-b24a-877185776536"
+      "source_ref": "indicator--62765697-1032-493a-958c-139921334156",
+      "target_ref": "vulnerability--53103635-1032-493a-958c-139921334156"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--89e7c744-9093-4f76-986a-459856977906",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-2747",
-      "description": "Unspecified Vulnerability",
+      "id": "vulnerability--84253757-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "Unspecified Vulnerability",
+      "description": "Unspecified Vulnerability.",
       "external_references": [
         {
           "source_name": "cve",
-          "external_id": "CVE-2025-2747"
+          "external_id": "CVE-2025-41244"
         }
       ]
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--1976845b-6221-463b-b288-214578954285",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-2747 Indicator",
-      "description": "Exploit detected",
-      "pattern": "[url:value LIKE '%.php?cmd=%']",
+      "id": "indicator--93874868-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
+      "name": "CVE-2025-41244 Exploit",
+      "description": "Indicator for potential exploitation of CVE-2025-41244 vulnerability.",
+      "pattern": "[file:path = '/tmp/evil.sh']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:31:04.000Z",
+      "valid_from": "2025-11-02T08:07:55.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -1155,39 +795,39 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--86764471-078d-475a-813c-697826105334",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
+      "id": "relationship--04985979-1032-493a-958c-139921334156",
+      "created": "2025-11-02T08:07:55.000Z",
+      "modified": "2025-11-02T08:07:55.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--1976845b-6221-463b-b288-214578954285",
-      "target_ref": "vulnerability--89e7c744-9093-4f76-986a-459856977906"
+      "source_ref": "indicator--93874868-1032-493a-958c-139921334156",
+      "target_ref": "vulnerability--84253757-1032-493a-958c-139921334156"
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--0c558c65-9185-497f-811a-502002359b0b",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-33073",
-      "description": "Unspecified Vulnerability",
+      "id": "vulnerability--5063901f-1256-491d-b04c-296787312114",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2017-20187",
+      "description": "Unspecified vulnerability",
       "external_references": [
         {
           "source_name": "cve",
-          "external_id": "CVE-2025-33073"
+          "external_id": "CVE-2017-20187"
         }
       ]
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--90298048-2691-4672-b91b-776806776119",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
-      "name": "CVE-2025-33073 Indicator",
-      "description": "Exploit detected",
-      "pattern": "[file:name = 'evil.sh']",
+      "id": "indicator--7638a35d-9740-454d-916d-686950836132",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2017-20187 Indicator",
+      "description": "Detecting CVE-2017-20187 exploitation",
+      "pattern": "[file:hashes.md5 = 'd41d8cd98f00b204e9800998ecf8427e']",
       "pattern_type": "stix",
-      "valid_from": "2025-10-30T06:31:04.000Z",
+      "valid_from": "2025-11-02T08:08:12.000Z",
       "labels": [
         "malicious-activity"
       ]
@@ -1195,12 +835,372 @@
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--29b14213-509e-4419-875f-513538985282",
-      "created": "2025-10-30T06:31:04.000Z",
-      "modified": "2025-10-30T06:31:04.000Z",
+      "id": "relationship--42220982-647e-4987-8999-68202647797c",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--90298048-2691-4672-b91b-776806776119",
-      "target_ref": "vulnerability--0c558c65-9185-497f-811a-502002359b0b"
+      "source_ref": "indicator--7638a35d-9740-454d-916d-686950836132",
+      "target_ref": "vulnerability--5063901f-1256-491d-b04c-296787312114"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--37509025-8261-444e-8620-458928589071",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2017-7252",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2017-7252"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8139281a-2261-4779-8836-035687371974",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2017-7252 Indicator",
+      "description": "Detecting CVE-2017-7252 exploitation",
+      "pattern": "[process:name = 'bad_process']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:12.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--7355459e-4911-4785-8b7d-70993190133a",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--8139281a-2261-4779-8836-035687371974",
+      "target_ref": "vulnerability--37509025-8261-444e-8620-458928589071"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--82764921-5496-461e-920f-987430185543",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2018-25092",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2018-25092"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--6082873a-487c-4987-987b-111990934332",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2018-25092 Indicator",
+      "description": "Detecting CVE-2018-25092 exploitation",
+      "pattern": "[network-traffic:dst_port = 8080]",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:12.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--92485543-7543-4393-9549-657839778745",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--6082873a-487c-4987-987b-111990934332",
+      "target_ref": "vulnerability--82764921-5496-461e-920f-987430185543"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--1728394a-6382-4541-a12f-262738495061",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2018-25093",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2018-25093"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9938472b-1234-4444-a123-1234567890ab",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2018-25093 Indicator",
+      "description": "Detecting CVE-2018-25093 exploitation",
+      "pattern": "[file:name LIKE '%.exe']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:12.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--abcdef01-1234-4567-89ab-cdef01234567",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--9938472b-1234-4444-a123-1234567890ab",
+      "target_ref": "vulnerability--1728394a-6382-4541-a12f-262738495061"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--fedcba98-7654-3210-fedc-ba9876543210",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2020-28407",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2020-28407"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "name": "CVE-2020-28407 Indicator",
+      "description": "Detecting CVE-2020-28407 exploitation",
+      "pattern": "[url:value LIKE '%/badurl%']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:12.000Z",
+      "labels": [
+        "malicious-activity"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--9d8e7f6a-5c4b-3a29-1807-f6e5d4c3b2a1",
+      "created": "2025-11-02T08:08:12.000Z",
+      "modified": "2025-11-02T08:08:12.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      "target_ref": "vulnerability--fedcba98-7654-3210-fedc-ba9876543210"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--3c7a6f1a-8d2a-4a1e-b3f9-7b8a9c1d2e3f",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2021-4430",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2021-4430"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a1b2c3d4-e5f6-4789-9012-34567890abcd",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2021-4430 Indicator",
+      "description": "Indicator for CVE-2021-4430",
+      "pattern": "[file:hashes.MD5 = 'd41d8cd98f00b204e9800998ecf8427e']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:28.000Z",
+      "labels": [
+        "vulnerability-indicator"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--b5c6d7e8-f9a0-4b1c-8d3e-5f4a3b2c1d0e",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a1b2c3d4-e5f6-4789-9012-34567890abcd",
+      "target_ref": "vulnerability--3c7a6f1a-8d2a-4a1e-b3f9-7b8a9c1d2e3f"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--9b8a7c6d-5e4f-4321-a098-76543210fedc",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-3172",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2022-3172"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c2d3e4f5-0a1b-4c5d-9e6f-78901234abcd",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-3172 Indicator",
+      "description": "Indicator for CVE-2022-3172",
+      "pattern": "[process:name = 'malicious_process.exe']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:28.000Z",
+      "labels": [
+        "vulnerability-indicator"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--d6e7f8a9-1b2c-4d3e-8f5a-901234567890",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--c2d3e4f5-0a1b-4c5d-9e6f-78901234abcd",
+      "target_ref": "vulnerability--9b8a7c6d-5e4f-4321-a098-76543210fedc"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--e0f1a2b3-2c3d-4e5f-a6b7-8d9e0f1a2b3c",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-43554",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2022-43554"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--f4a5b6c7-3d4e-4f5a-a8b9-0c1d2e3f4a5b",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-43554 Indicator",
+      "description": "Indicator for CVE-2022-43554",
+      "pattern": "[network-traffic:dst_port = 8080]",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:28.000Z",
+      "labels": [
+        "vulnerability-indicator"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--a8b9c0d1-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--f4a5b6c7-3d4e-4f5a-a8b9-0c1d2e3f4a5b",
+      "target_ref": "vulnerability--e0f1a2b3-2c3d-4e5f-a6b7-8d9e0f1a2b3c"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--b1c2d3e4-5f6a-4b7c-8d9e-0f1a2b3c4d5e",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-43555",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2022-43555"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c5d6e7f8-6a7b-4c8d-9e0f-1a2b3c4d5e6f",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-43555 Indicator",
+      "description": "Indicator for CVE-2022-43555",
+      "pattern": "[url:value LIKE '%/malicious.php']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:28.000Z",
+      "labels": [
+        "vulnerability-indicator"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--d9e0f1a2-7b8c-4d9e-0f1a-2b3c4d5e6f7a",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--c5d6e7f8-6a7b-4c8d-9e0f-1a2b3c4d5e6f",
+      "target_ref": "vulnerability--b1c2d3e4-5f6a-4b7c-8d9e-0f1a2b3c4d5e"
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--f2a3b4c5-8c9d-4e0f-1a2b-3c4d5e6f7a8b",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-44569",
+      "description": "Unspecified vulnerability",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2022-44569"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a6b7c8d9-9d0e-4f1a-2b3c-4d5e6f7a8b9c",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "name": "CVE-2022-44569 Indicator",
+      "description": "Indicator for CVE-2022-44569",
+      "pattern": "[file:name = 'evil.dll']",
+      "pattern_type": "stix",
+      "valid_from": "2025-11-02T08:08:28.000Z",
+      "labels": [
+        "vulnerability-indicator"
+      ]
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--b0c1d2e3-0e1f-4a2b-3c4d-5e6f7a8b9c0d",
+      "created": "2025-11-02T08:08:28.000Z",
+      "modified": "2025-11-02T08:08:28.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--a6b7c8d9-9d0e-4f1a-2b3c-4d5e6f7a8b9c",
+      "target_ref": "vulnerability--f2a3b4c5-8c9d-4e0f-1a2b-3c4d5e6f7a8b"
     }
   ]
 }
