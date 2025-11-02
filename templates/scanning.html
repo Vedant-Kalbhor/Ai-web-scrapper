@@ -4,46 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scanning in Progress</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1a365d;
+            --primary-dark: #0f2544;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --accent: #e53e3e;
+            --accent-light: #f56565;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--background);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--text);
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
             text-align: center;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
         }
 
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            font-size: 2.8rem;
+            margin-bottom: 25px;
             font-weight: 700;
+            color: var(--primary);
         }
 
         .scanner-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 50px 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 60px 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanner-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .progress-ring {
             position: relative;
             width: 200px;
             height: 200px;
-            margin: 0 auto 30px;
+            margin: 0 auto 40px;
         }
 
         .progress-ring-circle {
@@ -52,16 +89,16 @@
         }
 
         .radar {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 30px;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 40px;
             position: relative;
         }
 
         .radar-circle {
             width: 100%;
             height: 100%;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(13, 148, 136, 0.2);
             border-radius: 50%;
             position: absolute;
             animation: pulse 2s ease-in-out infinite;
@@ -77,8 +114,8 @@
 
         .radar-line {
             width: 2px;
-            height: 75px;
-            background: white;
+            height: 90px;
+            background: var(--secondary);
             position: absolute;
             top: 0;
             left: 50%;
@@ -103,111 +140,214 @@
         }
 
         .status-text {
-            font-size: 1.3em;
-            margin-bottom: 15px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
             font-weight: 600;
+            color: var(--primary);
         }
 
         .progress-text {
-            font-size: 1em;
-            opacity: 0.9;
-            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-weight: 500;
         }
 
         .step-indicator {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
         .step {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--border);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .step.active {
-            background: white;
-            transform: scale(1.5);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            background: var(--secondary);
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(13, 148, 136, 0.5);
         }
 
         .step.completed {
-            background: #4ade80;
+            background: var(--success);
+        }
+
+        .step.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
         .dashboard-btn {
             display: inline-block;
-            padding: 18px 40px;
-            background: white;
-            color: #667eea;
+            padding: 18px 45px;
+            background: var(--primary);
+            color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 700;
-            font-size: 1.2em;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             animation: glow 2s ease-in-out infinite;
+            border: none;
+            cursor: pointer;
         }
 
         .dashboard-btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 15px 30px rgba(26, 54, 93, 0.3);
+            background: var(--primary-dark);
         }
 
         @keyframes glow {
             0%, 100% {
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 10px 25px rgba(26, 54, 93, 0.2);
             }
             50% {
-                box-shadow: 0 10px 40px rgba(255, 255, 255, 0.5);
+                box-shadow: 0 10px 30px rgba(26, 54, 93, 0.4);
             }
         }
 
         .error-box {
-            background: rgba(220, 53, 69, 0.2);
-            border: 2px solid rgba(220, 53, 69, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
+            background: rgba(229, 62, 62, 0.1);
+            border: 2px solid rgba(229, 62, 62, 0.3);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-top: 25px;
+            color: var(--accent);
+            font-weight: 500;
         }
 
-        .hidden { display: none; }
+        .hidden { 
+            display: none; 
+        }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
+            gap: 20px;
+            margin-top: 40px;
             text-align: left;
         }
 
         .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
         }
 
         .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: 1.5em;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: var(--success);
+            margin-bottom: 25px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .scan-animation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .scan-bar {
+            width: 80%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scan-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .scan-dots {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 10px auto 0;
+        }
+
+        .scan-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .scan-dot.active {
+            background: var(--secondary);
+            transform: scale(1.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .scanner-container { padding: 40px 25px; }
+            .radar { width: 150px; height: 150px; }
+            .stats { grid-template-columns: 1fr; }
+            .dashboard-btn { padding: 16px 35px; font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="scanning-section" class="scanner-container">
-            <h1>Scanning Vulnerabilities</h1>
+            <h1>Security Scan in Progress</h1>
             
+            <div class="scan-animation">
+                <div class="scan-bar">
+                    <div class="scan-progress" id="scanProgress"></div>
+                </div>
+            </div>
+            
+            <div class="scan-dots">
+                <div class="scan-dot" id="dot1"></div>
+                <div class="scan-dot" id="dot2"></div>
+                <div class="scan-dot" id="dot3"></div>
+                <div class="scan-dot" id="dot4"></div>
+                <div class="scan-dot" id="dot5"></div>
+            </div>
+
             <div class="radar">
                 <div class="radar-circle"></div>
                 <div class="radar-circle"></div>
@@ -222,8 +362,8 @@
                 <div class="step" id="step4"></div>
             </div>
 
-            <p class="status-text" id="status-text">Initializing scan...</p>
-            <p class="progress-text" id="progress-text">Please wait while we gather the latest vulnerability data</p>
+            <p class="status-text" id="status-text">Initializing security scan...</p>
+            <p class="progress-text" id="progress-text">Please wait while we gather the latest vulnerability intelligence</p>
 
             <div class="stats hidden" id="stats">
                 <div class="stat-item">
@@ -238,22 +378,33 @@
         </div>
 
         <div id="complete-section" class="scanner-container hidden">
-            <h1>✅ Scan Complete!</h1>
-            <p style="font-size: 1.2em; margin: 20px 0;">Your vulnerability report is ready</p>
-            <a href="/dashboard" class="dashboard-btn">View Dashboard</a>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Scan Complete!</h1>
+            <p style="font-size: 1.3rem; margin: 25px 0; color: var(--text-light);">Your vulnerability report is ready for analysis</p>
+            <a href="/dashboard" class="dashboard-btn">
+                <i class="fas fa-chart-line"></i> View Dashboard
+            </a>
         </div>
 
         <div id="error-section" class="scanner-container hidden">
-            <h1>Error Occurred</h1>
-            <div class="error-box">
-                <p id="error-message">An error occurred during scanning</p>
+            <div style="font-size: 4rem; color: var(--accent); margin-bottom: 25px;">
+                <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <a href="/" class="dashboard-btn" style="margin-top: 20px; background: #dc3545;">🔄 Try Again</a>
+            <h1>Scan Error</h1>
+            <div class="error-box">
+                <p id="error-message">An error occurred during the scanning process</p>
+            </div>
+            <a href="/" class="dashboard-btn" style="margin-top: 30px; background: var(--accent);">
+                <i class="fas fa-redo"></i> Try Again
+            </a>
         </div>
     </div>
 
     <script>
         let currentStep = 0;
+        let progressInterval;
 
         async function updateStatus() {
             try {
@@ -264,19 +415,22 @@
                 if (data.current_step !== currentStep) {
                     currentStep = data.current_step;
                     updateSteps(currentStep);
+                    updateProgress(currentStep);
                 }
 
                 // Update text
                 document.getElementById('status-text').textContent = 
-                    data.progress || 'Processing...';
+                    data.progress || 'Processing security data...';
 
                 // Show completion
                 if (data.download_ready) {
+                    clearInterval(progressInterval);
                     document.getElementById('scanning-section').classList.add('hidden');
                     document.getElementById('complete-section').classList.remove('hidden');
                 } 
                 // Show error
                 else if (data.error) {
+                    clearInterval(progressInterval);
                     document.getElementById('scanning-section').classList.add('hidden');
                     document.getElementById('error-section').classList.remove('hidden');
                     document.getElementById('error-message').textContent = data.error;
@@ -304,7 +458,38 @@
             }
         }
 
-        // Start status checking
+        function updateProgress(step) {
+            const progress = document.getElementById('scanProgress');
+            const dots = document.querySelectorAll('.scan-dot');
+            
+            // Update progress bar
+            const progressPercent = (step / 4) * 100;
+            progress.style.width = `${progressPercent}%`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index < step) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        function startProgressAnimation() {
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += 0.5;
+                if (progress > 100) progress = 0;
+                
+                const progressBar = document.getElementById('scanProgress');
+                if (progressBar) {
+                    progressBar.style.width = `${progress}%`;
+                }
+            }, 50);
+        }
+
+        // Start status checking and animation
+        startProgressAnimation();
         updateStatus();
     </script>
 </body>

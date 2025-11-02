@@ -4,42 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generating STIX File</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #1a365d;
+            --primary-dark: #0f2544;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --accent: #e53e3e;
+            --accent-light: #f56565;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--background);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            line-height: 1.6;
         }
 
         .container {
             text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            padding: 50px 40px;
+            background: var(--surface);
+            border-radius: var(--radius);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            font-weight: 600;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: var(--primary);
         }
 
         .spinner {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             margin: 30px auto;
-            border: 8px solid rgba(255, 255, 255, 0.3);
-            border-top: 8px solid white;
+            border: 8px solid rgba(13, 148, 136, 0.2);
+            border-top: 8px solid var(--secondary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -50,33 +85,36 @@
         }
 
         .status-text {
-            font-size: 1.2em;
-            margin-top: 20px;
-            min-height: 30px;
-            font-weight: 300;
+            font-size: 1.3rem;
+            margin-top: 25px;
+            min-height: 40px;
+            font-weight: 600;
+            color: var(--primary);
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            background: var(--border);
             border-radius: 10px;
-            margin-top: 30px;
+            margin-top: 35px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: white;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             width: 0%;
             transition: width 0.5s ease;
             border-radius: 10px;
         }
 
         .success-icon {
-            font-size: 4em;
+            font-size: 5rem;
             display: none;
             animation: scaleIn 0.5s ease;
+            color: var(--success);
+            margin-bottom: 25px;
         }
 
         @keyframes scaleIn {
@@ -86,46 +124,184 @@
         }
 
         .error-message {
-            color: #ff6b6b;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+            color: var(--accent);
+            background: rgba(229, 62, 62, 0.1);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 25px;
             display: none;
+            font-weight: 600;
+            border: 1px solid rgba(229, 62, 62, 0.3);
         }
 
         .back-button {
             display: none;
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: white;
-            color: #667eea;
+            margin-top: 30px;
+            padding: 14px 35px;
+            background: var(--primary);
+            color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: 600;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
         }
 
         .back-button:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 54, 93, 0.3);
+        }
+
+        .stix-icon {
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 25px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 25px auto 0;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 3px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-light);
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            border-color: var(--secondary);
+            background: var(--secondary);
+            color: white;
+        }
+
+        .progress-step.completed {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 10px auto 0;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .step-label {
+            text-align: center;
+            width: 80px;
+        }
+
+        .download-info {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 25px;
+            border-left: 4px solid var(--secondary);
+            text-align: left;
+        }
+
+        .download-info h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-info ul {
+            margin: 15px 0 0 0;
+            padding-left: 20px;
+            color: var(--text-light);
+        }
+
+        .download-info li {
+            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="stix-icon">
+            <i class="fas fa-file-export"></i>
+        </div>
         <h1>STIX Generator</h1>
         <div class="spinner" id="spinner"></div>
-        <div class="success-icon" id="successIcon">✅</div>
+        <div class="success-icon" id="successIcon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <div class="progress-steps">
+            <div class="progress-step" id="step1">1</div>
+            <div class="progress-step" id="step2">2</div>
+            <div class="progress-step" id="step3">3</div>
+            <div class="progress-step" id="step4">4</div>
+        </div>
+
+        <div class="step-labels">
+            <div class="step-label">Reading Data</div>
+            <div class="step-label">Generating</div>
+            <div class="step-label">Validating</div>
+            <div class="step-label">Exporting</div>
+        </div>
+
         <p class="status-text" id="statusText">Initializing STIX generation...</p>
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
+
+        <div class="download-info">
+            <h3><i class="fas fa-info-circle"></i> About STIX Files</h3>
+            <p style="margin: 10px 0 0 0; color: var(--text-light);">
+                STIX (Structured Threat Information Expression) is a standardized language for sharing cyber threat intelligence.
+            </p>
+            <ul>
+                <li>Compatible with SIEM systems like Splunk</li>
+                <li>Standardized format for threat intelligence sharing</li>
+                <li>Includes vulnerability details and mitigation data</li>
+            </ul>
+        </div>
+
         <div class="error-message" id="errorMessage"></div>
-        <button class="back-button" id="backButton" onclick="window.location.href='/dashboard'">
-            ← Back to Dashboard
-        </button>
+        <a href="/dashboard" class="back-button" id="backButton">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
     </div>
 
     <script>
@@ -151,8 +327,9 @@
                     statusText.textContent = 'Generation Failed';
                     errorMessage.textContent = 'Error: ' + data.error;
                     errorMessage.style.display = 'block';
-                    backButton.style.display = 'inline-block';
+                    backButton.style.display = 'inline-flex';
                     progressFill.style.width = '0%';
+                    updateSteps(0);
                     return;
                 }
 
@@ -160,14 +337,20 @@
                     statusText.textContent = data.progress;
                 }
 
-                // Update progress bar based on status
+                // Update progress steps
                 if (data.is_generating) {
-                    if (data.progress.includes('Reading')) {
+                    if (data.progress.includes('Reading') || data.progress.includes('Collecting')) {
+                        updateSteps(1);
                         progressFill.style.width = '25%';
-                    } else if (data.progress.includes('Generating')) {
+                    } else if (data.progress.includes('Generating') || data.progress.includes('Creating')) {
+                        updateSteps(2);
                         progressFill.style.width = '50%';
-                    } else if (data.progress.includes('Validating')) {
+                    } else if (data.progress.includes('Validating') || data.progress.includes('Processing')) {
+                        updateSteps(3);
                         progressFill.style.width = '75%';
+                    } else if (data.progress.includes('Finalizing') || data.progress.includes('Exporting')) {
+                        updateSteps(4);
+                        progressFill.style.width = '90%';
                     }
                 }
 
@@ -180,21 +363,36 @@
                     spinner.style.display = 'none';
                     successIcon.style.display = 'block';
                     statusText.textContent = 'STIX file generated successfully!';
+                    updateSteps(5);
 
                     // Trigger download
                     setTimeout(() => {
-                        statusText.textContent = 'Downloading...';
+                        statusText.textContent = 'Starting download...';
                         window.location.href = '/download_stix';
                         
-                        // Redirect to dashboard after download starts
+                        // Show back button after download starts
                         setTimeout(() => {
-                            window.location.href = '/dashboard';
+                            statusText.textContent = 'Download complete!';
+                            backButton.style.display = 'inline-flex';
                         }, 2000);
-                    }, 1000);
+                    }, 1500);
                 }
 
             } catch (err) {
                 console.error('Status check error:', err);
+            }
+        }
+
+        function updateSteps(step) {
+            for (let i = 1; i <= 4; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepElement.classList.add('completed');
+                } else if (i === step) {
+                    stepElement.classList.add('active');
+                }
             }
         }
 
@@ -206,18 +404,18 @@
                 
                 if (data.status === 'started' || data.status === 'already_running') {
                     // Start polling for status
-                    checkInterval = setInterval(checkStatus, 1000);
+                    checkInterval = setInterval(checkStatus, 1500);
                 } else {
-                    document.getElementById('errorMessage').textContent = 'Failed to start generation';
+                    document.getElementById('errorMessage').textContent = 'Failed to start generation: ' + (data.error || 'Unknown error');
                     document.getElementById('errorMessage').style.display = 'block';
                     document.getElementById('spinner').style.display = 'none';
-                    document.getElementById('backButton').style.display = 'inline-block';
+                    document.getElementById('backButton').style.display = 'inline-flex';
                 }
             } catch (err) {
                 document.getElementById('errorMessage').textContent = 'Network error: ' + err.message;
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('spinner').style.display = 'none';
-                document.getElementById('backButton').style.display = 'inline-block';
+                document.getElementById('backButton').style.display = 'inline-flex';
             }
         }
 
