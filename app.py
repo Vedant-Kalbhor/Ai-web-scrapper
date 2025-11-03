@@ -152,6 +152,7 @@ def api_exploits():
             "exploits": [],
             "total_exploits": 0
         }), 500
+    
 @app.route('/generate_stix', methods=['POST'])
 def generate_stix():
     """Start STIX file generation in background"""
