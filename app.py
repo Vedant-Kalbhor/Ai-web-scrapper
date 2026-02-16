@@ -6,10 +6,10 @@ from scrape import scrape_all_parallel
 from parse import parse_vulnerabilities_with_ai, generate_ai_insights, find_mitigation
 from report import generate_report
 import json
-from datetime import datetime
-from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
 from datetime import datetime, timedelta
 import pickle
+from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
+
 # Near the top with other imports:
 from enhanced_verification import CVEVerifier, VulnerabilityValidator
 from verification_config import (
@@ -19,35 +19,118 @@ from verification_config import (
     VERIFICATION_RULES
 )
 
-CACHE_FILE = "vuln_cache.pkl"
-CACHE_DURATION = timedelta(days=1)  # 1 day cache validity
-
-def get_cached_report():
-    """Return cached data if it's still valid."""
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "rb") as f:
-            cache = pickle.load(f)
-        if datetime.now() - cache["timestamp"] < CACHE_DURATION:
-            print("✅ Using cached vulnerability report")
-            return cache["data"]
-    return None
-
-def save_cached_report(data):
-    """Save scraped + parsed report to cache."""
-    with open(CACHE_FILE, "wb") as f:
-        pickle.dump({"timestamp": datetime.now(), "data": data}, f)
-
+from exploit_scraper import scrape_all_exploits_parallel
+from exploit_parser import enrich_exploit_with_ai
 
 app = Flask(__name__)
 
+# File paths
 REPORT_FILE = "vulnerability_report.txt"
 JSON_FILE = "vulnerability_report.json"
+EXPLOITS_JSON_FILE = "exploits_report.json"
+VULN_CACHE_FILE = "vuln_cache.pkl"
+EXPLOIT_CACHE_FILE = "exploit_cache.pkl"
+STIX_FILE_PATH = "vulnerabilities_stix.json"
 
-# STIX Generator Import
+# Cache settings
+CACHE_DURATION = timedelta(hours=24)  # 24 hour cache validity
+
+
+# ===================================================================
+# CACHE UTILITY FUNCTIONS
+# ===================================================================
+
+def get_cached_vulnerabilities():
+    """Return cached vulnerability data if it's still valid (< 24 hours old)"""
+    if os.path.exists(VULN_CACHE_FILE):
+        try:
+            with open(VULN_CACHE_FILE, "rb") as f:
+                cache = pickle.load(f)
+            
+            cache_age = datetime.now() - cache["timestamp"]
+            
+            if cache_age < CACHE_DURATION:
+                hours_old = cache_age.total_seconds() / 3600
+                print(f"✅ Using cached vulnerability report ({hours_old:.1f} hours old)")
+                return cache["data"]
+            else:
+                print(f"⚠️  Vulnerability cache expired ({cache_age.total_seconds() / 3600:.1f} hours old)")
+        except Exception as e:
+            print(f"⚠️  Error reading vulnerability cache: {e}")
+    
+    return None
+
+
+def save_cached_vulnerabilities(data):
+    """Save vulnerability report to cache with timestamp"""
+    try:
+        with open(VULN_CACHE_FILE, "wb") as f:
+            pickle.dump({"timestamp": datetime.now(), "data": data}, f)
+        print(f"💾 Vulnerability cache saved at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    except Exception as e:
+        print(f"⚠️  Error saving vulnerability cache: {e}")
+
+
+def get_cached_exploits():
+    """Return cached exploit data if it's still valid (< 24 hours old)"""
+    if os.path.exists(EXPLOIT_CACHE_FILE):
+        try:
+            with open(EXPLOIT_CACHE_FILE, "rb") as f:
+                cache = pickle.load(f)
+            
+            cache_age = datetime.now() - cache["timestamp"]
+            
+            if cache_age < CACHE_DURATION:
+                hours_old = cache_age.total_seconds() / 3600
+                print(f"✅ Using cached exploits ({hours_old:.1f} hours old)")
+                return cache["data"]
+            else:
+                print(f"⚠️  Exploit cache expired ({cache_age.total_seconds() / 3600:.1f} hours old)")
+        except Exception as e:
+            print(f"⚠️  Error reading exploit cache: {e}")
+    
+    return None
+
+
+def save_cached_exploits(data):
+    """Save exploits to cache with timestamp"""
+    try:
+        with open(EXPLOIT_CACHE_FILE, "wb") as f:
+            pickle.dump({"timestamp": datetime.now(), "data": data}, f)
+        print(f"💾 Exploit cache saved at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    except Exception as e:
+        print(f"⚠️  Error saving exploit cache: {e}")
+
+
+def get_cache_info(cache_file):
+    """Get cache age information"""
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "rb") as f:
+                cache = pickle.load(f)
+            
+            cache_age = datetime.now() - cache["timestamp"]
+            hours_old = cache_age.total_seconds() / 3600
+            
+            return {
+                "exists": True,
+                "timestamp": cache["timestamp"].strftime("%Y-%m-%d %H:%M:%S"),
+                "age_hours": round(hours_old, 1),
+                "is_valid": cache_age < CACHE_DURATION,
+                "expires_in_hours": round(24 - hours_old, 1) if cache_age < CACHE_DURATION else 0
+            }
+        except Exception as e:
+            return {"exists": False, "error": str(e)}
+    
+    return {"exists": False}
+
+
+# ===================================================================
+# STIX GENERATION
+# ===================================================================
+
 from stix_generator import generate_stix_from_report
 
-# STIX Generation Variables
-STIX_FILE_PATH = "vulnerabilities_stix.json"
 stix_status = {
     "is_generating": False, 
     "progress": None, 
@@ -69,7 +152,6 @@ def generate_stix_task():
         
         stix_status["progress"] = "Generating STIX format with AI..."
         
-        # Generate STIX file from the vulnerabilities.json
         output_path = generate_stix_from_report(
             json_report_path=JSON_FILE,
             output_path=STIX_FILE_PATH
@@ -77,7 +159,6 @@ def generate_stix_task():
         
         stix_status["progress"] = "Validating STIX file..."
         
-        # Verify file was created
         if not os.path.exists(output_path):
             raise Exception("STIX file generation failed")
         
@@ -94,57 +175,10 @@ def generate_stix_task():
         stix_status["is_generating"] = False
 
 
-@app.route('/generate_stix', methods=['POST'])
-def generate_stix():
-    """Start STIX file generation in background"""
-    if not stix_status["is_generating"]:
-        # Check if vulnerability data exists
-        if not os.path.exists(JSON_FILE):
-            return jsonify({
-                "status": "error",
-                "message": "No vulnerability data found. Please run a scan first."
-            }), 400
-        
-        # Reset status
-        stix_status.update({
-            "is_generating": False,
-            "progress": None,
-            "error": None,
-            "download_ready": False
-        })
-        
-        thread = threading.Thread(target=generate_stix_task, daemon=True)
-        thread.start()
-        return jsonify({"status": "started"})
-    return jsonify({"status": "already_running"})
+# ===================================================================
+# VULNERABILITY SCANNING
+# ===================================================================
 
-
-@app.route('/stix_status')
-def get_stix_status():
-    """Get current status of STIX generation"""
-    return jsonify(stix_status)
-
-
-@app.route('/download_stix')
-def download_stix():
-    """Download the generated STIX file"""
-    if os.path.exists(STIX_FILE_PATH):
-        return send_file(
-            STIX_FILE_PATH, 
-            as_attachment=True,
-            download_name=f"vulnerabilities_stix_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-            mimetype="application/json"
-        )
-    return "STIX file not found", 404
-
-
-@app.route('/stix_loading')
-def stix_loading_page():
-    """Show STIX generation loading page"""
-    return render_template('stix_loading.html')
-
-
-# Regular vulnerability scanning status
 report_status = {
     "is_generating": False,
     "progress": "",
@@ -154,45 +188,33 @@ report_status = {
     "total_steps": 4
 }
 
+
 def generate_report_task():
-    """Optimized report generation - parallel scraping with caching"""
+    """Optimized report generation with 24-hour caching"""
     try:
-        print(">> Starting vulnerability scan...")
+        print("\n" + "="*60)
+        print("Starting Vulnerability Scan")
+        print("="*60)
+        
         report_status["is_generating"] = True
         report_status["error"] = None
         report_status["download_ready"] = False
         report_status["current_step"] = 0
 
-        from datetime import datetime, timedelta
-        import pickle
-
-        CACHE_FILE = "vuln_cache.pkl"
-        CACHE_DURATION = timedelta(days=1)
-
-        def get_cached_report():
-            if os.path.exists(CACHE_FILE):
-                with open(CACHE_FILE, "rb") as f:
-                    cache = pickle.load(f)
-                if datetime.now() - cache["timestamp"] < CACHE_DURATION:
-                    print("✅ Using cached vulnerability report")
-                    return cache["data"]
-            return None
-
-        def save_cached_report(data):
-            with open(CACHE_FILE, "wb") as f:
-                pickle.dump({"timestamp": datetime.now(), "data": data}, f)
-
         # Step 0: Check cache first
         report_status["progress"] = "Checking cache..."
-        cached_data = get_cached_report()
+        cached_data = get_cached_vulnerabilities()
+        
         if cached_data:
-            print("⚡ Returning cached report (same-day scan)")
+            print("⚡ Returning cached report (< 24 hours old)")
             with open(JSON_FILE, "w", encoding="utf-8") as f:
                 json.dump(cached_data, f, indent=2)
             generate_report(cached_data["vulnerabilities"])
             report_status["download_ready"] = True
             report_status["progress"] = "Scan complete! [CACHED]"
             return
+
+        print("🔄 Cache expired or not found - starting fresh scan")
 
         # Clean old files
         for file in [REPORT_FILE, JSON_FILE, STIX_FILE_PATH]:
@@ -202,9 +224,9 @@ def generate_report_task():
         # Step 1: Initialize
         report_status["current_step"] = 1
         report_status["progress"] = "Initializing parallel scraping..."
-        print(f"[*] Preparing to scrape sources...")
+        print("[*] Preparing to scrape sources...")
 
-        # Step 2: Parallel scraping (MUCH FASTER!)
+        # Step 2: Parallel scraping
         report_status["current_step"] = 2
         report_status["progress"] = "Scraping all sources in parallel..."
         scraped_data = scrape_all_parallel(max_workers=3)
@@ -216,6 +238,7 @@ def generate_report_task():
         report_status["current_step"] = 3
         report_status["progress"] = "Analyzing vulnerabilities with AI..."
         all_vulnerabilities = []
+        
         for item in scraped_data:
             try:
                 vulnerabilities = parse_vulnerabilities_with_ai(
@@ -226,7 +249,7 @@ def generate_report_task():
             except Exception as e:
                 print(f"[!] Error parsing {item['source']}: {e}")
 
-        # Remove duplicates based on CVE ID
+        # Remove duplicates
         seen_cves = set()
         unique_vulns = []
         for vuln in all_vulnerabilities:
@@ -234,10 +257,10 @@ def generate_report_task():
             if cve_id and cve_id not in seen_cves:
                 seen_cves.add(cve_id)
                 unique_vulns.append(vuln)
-            elif not cve_id:  # Keep non-CVE vulnerabilities
+            elif not cve_id:
                 unique_vulns.append(vuln)
 
-        # Sort by severity (CRITICAL > HIGH > MEDIUM > LOW > UNKNOWN)
+        # Sort by severity
         severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "UNKNOWN": 4}
         unique_vulns.sort(key=lambda x: severity_order.get(x.get("severity", "UNKNOWN").upper(), 5))
 
@@ -254,7 +277,7 @@ def generate_report_task():
             "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
             "total_vulnerabilities": len(unique_vulns),
             "sources_scanned": len(scraped_data),
-            "vulnerabilities": unique_vulns[:50]  # Limit to 50 for dashboard
+            "vulnerabilities": unique_vulns[:50]
         }
 
         with open(JSON_FILE, "w", encoding="utf-8") as f:
@@ -263,7 +286,7 @@ def generate_report_task():
 
         # Generate AI insights
         try:
-            insights = generate_ai_insights(unique_vulns[:20])  # Use top 20 for insights
+            insights = generate_ai_insights(unique_vulns[:20])
             dashboard_data["ai_insights"] = insights
             
             with open(JSON_FILE, "w", encoding="utf-8") as f:
@@ -272,12 +295,13 @@ def generate_report_task():
         except Exception as e:
             print(f"[!] Could not generate AI insights: {e}")
 
-        # ✅ Save to cache for same-day reuse
-        save_cached_report(dashboard_data)
+        # Save to cache
+        save_cached_vulnerabilities(dashboard_data)
 
         report_status["download_ready"] = True
-        report_status["progress"] = "Scan complete! [DONE]"
+        report_status["progress"] = "Scan complete! [FRESH]"
         print("[+] Report generation complete")
+        print("="*60 + "\n")
 
     except Exception as e:
         print("[!] Error in report task:", e)
@@ -288,6 +312,93 @@ def generate_report_task():
         report_status["is_generating"] = False
 
 
+# ===================================================================
+# EXPLOIT SCRAPING WITH CACHING
+# ===================================================================
+
+exploit_status = {
+    "is_scraping": False,
+    "progress": "",
+    "error": None,
+    "download_ready": False
+}
+
+
+def scrape_exploits_task():
+    """Scrape exploits with 24-hour caching"""
+    try:
+        print("\n" + "="*60)
+        print("Starting Exploit Scraping")
+        print("="*60)
+        
+        exploit_status["is_scraping"] = True
+        exploit_status["error"] = None
+        exploit_status["download_ready"] = False
+        exploit_status["progress"] = "Checking cache..."
+
+        # Check cache first
+        cached_data = get_cached_exploits()
+        
+        if cached_data:
+            print("⚡ Returning cached exploits (< 24 hours old)")
+            with open(EXPLOITS_JSON_FILE, "w", encoding="utf-8") as f:
+                json.dump(cached_data, f, indent=2)
+            exploit_status["download_ready"] = True
+            exploit_status["progress"] = "Exploits ready! [CACHED]"
+            return
+
+        print("🔄 Cache expired or not found - starting fresh scrape")
+
+        exploit_status["progress"] = "Scraping exploit databases..."
+        
+        # Scrape all sources in parallel
+        exploits = scrape_all_exploits_parallel(max_workers=3)
+        
+        if not exploits:
+            raise Exception("No exploits found from any source")
+        
+        exploit_status["progress"] = f"Enriching {min(50, len(exploits))} exploits with AI..."
+        
+        # Enrich first 50 exploits with AI descriptions
+        print(f"[*] Enriching top {min(50, len(exploits))} exploits with AI...")
+        for i, exploit in enumerate(exploits[:50]):
+            try:
+                exploits[i] = enrich_exploit_with_ai(exploit)
+            except Exception as e:
+                print(f"[!] Could not enrich exploit {exploit.get('id')}: {e}")
+        
+        # Save to JSON file
+        exploit_data = {
+            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "total_exploits": len(exploits),
+            "exploits": exploits,
+            "cache_expires": (datetime.now() + CACHE_DURATION).strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        with open(EXPLOITS_JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump(exploit_data, f, indent=2)
+        
+        # Save to cache
+        save_cached_exploits(exploit_data)
+        
+        exploit_status["download_ready"] = True
+        exploit_status["progress"] = "Exploits ready! [FRESH]"
+        
+        print(f"[+] Successfully scraped {len(exploits)} exploits")
+        print("="*60 + "\n")
+        
+    except Exception as e:
+        print(f"[!] Error in exploit scraping: {e}")
+        traceback.print_exc()
+        exploit_status["error"] = str(e)
+        exploit_status["progress"] = "Error occurred"
+    finally:
+        exploit_status["is_scraping"] = False
+
+
+# ===================================================================
+# ROUTES
+# ===================================================================
 
 @app.route('/')
 def index():
@@ -331,6 +442,71 @@ def mitigation_page():
     return render_template("mitigation.html")
 
 
+@app.route('/exploits')
+def exploits_page():
+    """Latest exploits page"""
+    return render_template('exploits.html')
+
+
+# ===================================================================
+# API ENDPOINTS - EXPLOITS
+# ===================================================================
+
+@app.route('/api/exploits')
+def api_exploits():
+    """Get latest exploits (uses cache if available)"""
+    # Check if cached data exists and is valid
+    if os.path.exists(EXPLOITS_JSON_FILE):
+        try:
+            with open(EXPLOITS_JSON_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            # Add cache info
+            cache_info = get_cache_info(EXPLOIT_CACHE_FILE)
+            data["cache_info"] = cache_info
+            
+            return jsonify(data)
+        except Exception as e:
+            print(f"[!] Error reading exploits file: {e}")
+    
+    return jsonify({
+        "error": "No exploits available. Click 'Refresh Exploits' to fetch new data.",
+        "exploits": [],
+        "total_exploits": 0,
+        "cache_info": get_cache_info(EXPLOIT_CACHE_FILE)
+    }), 404
+
+
+@app.route('/api/exploits/refresh', methods=['POST'])
+def refresh_exploits():
+    """Force refresh exploits (ignores cache)"""
+    if not exploit_status["is_scraping"]:
+        print("[*] Forcing exploit refresh...")
+        
+        # Delete cache to force fresh scrape
+        if os.path.exists(EXPLOIT_CACHE_FILE):
+            os.remove(EXPLOIT_CACHE_FILE)
+            print("[*] Exploit cache cleared")
+        
+        thread = threading.Thread(target=scrape_exploits_task, daemon=True)
+        thread.start()
+        return jsonify({"status": "started", "message": "Scraping fresh exploits..."})
+    else:
+        return jsonify({"status": "already_running", "message": "Exploit scraping already in progress"})
+
+
+@app.route('/api/exploits/status')
+def exploit_scraping_status():
+    """Get exploit scraping status"""
+    status_data = exploit_status.copy()
+    status_data["cache_info"] = get_cache_info(EXPLOIT_CACHE_FILE)
+    return jsonify(status_data)
+
+
+# ===================================================================
+# API ENDPOINTS - VULNERABILITIES
+# ===================================================================
+
 @app.route('/get_report')
 def get_report():
     """Download text report"""
@@ -347,7 +523,44 @@ def api_vulnerabilities():
 
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
+    
+    # Add cache info
+    data["cache_info"] = get_cache_info(VULN_CACHE_FILE)
+    
     return jsonify(data)
+
+
+@app.route('/api/cache/info')
+def cache_info():
+    """Get cache information for both vulnerabilities and exploits"""
+    return jsonify({
+        "vulnerabilities": get_cache_info(VULN_CACHE_FILE),
+        "exploits": get_cache_info(EXPLOIT_CACHE_FILE),
+        "cache_duration_hours": 24
+    })
+
+
+@app.route('/api/cache/clear', methods=['POST'])
+def clear_cache():
+    """Clear all caches"""
+    data = request.get_json() or {}
+    cache_type = data.get('type', 'all')  # 'all', 'vulnerabilities', or 'exploits'
+    
+    cleared = []
+    
+    if cache_type in ['all', 'vulnerabilities'] and os.path.exists(VULN_CACHE_FILE):
+        os.remove(VULN_CACHE_FILE)
+        cleared.append('vulnerabilities')
+    
+    if cache_type in ['all', 'exploits'] and os.path.exists(EXPLOIT_CACHE_FILE):
+        os.remove(EXPLOIT_CACHE_FILE)
+        cleared.append('exploits')
+    
+    return jsonify({
+        "success": True,
+        "cleared": cleared,
+        "message": f"Cleared cache for: {', '.join(cleared)}" if cleared else "No cache to clear"
+    })
 
 
 @app.route('/api/search', methods=['GET'])
@@ -369,22 +582,18 @@ def api_search():
     # Search across multiple fields
     results = []
     for vuln in vulnerabilities:
-        # Search in CVE ID
         if query in vuln.get("id", "").lower():
             results.append(vuln)
             continue
         
-        # Search in title
         if query in vuln.get("title", "").lower():
             results.append(vuln)
             continue
         
-        # Search in description
         if query in vuln.get("description", "").lower():
             results.append(vuln)
             continue
         
-        # Search in affected products
         for product in vuln.get("affected_products", []):
             if query in product.lower():
                 results.append(vuln)
@@ -417,7 +626,7 @@ def api_mitigation():
 
 
 # ===================================================================
-# AI-POWERED WEB SEARCH ROUTES (NEW)
+# AI-POWERED WEB SEARCH ROUTES
 # ===================================================================
 
 @app.route('/ai_search')
@@ -428,9 +637,7 @@ def ai_search_page():
 
 @app.route('/api/ai_search', methods=['POST'])
 def api_ai_search():
-    """
-    API endpoint for AI-powered vulnerability search with VERIFICATION
-    """
+    """API endpoint for AI-powered vulnerability search with VERIFICATION"""
     data = request.get_json()
     query = data.get('query', '').strip()
     
@@ -440,27 +647,13 @@ def api_ai_search():
             "error": "Please provide a software or organization name"
         }), 400
     
-    print(f"[*] AI Search Request: {query}")
-    print(f"[*] Verification enabled: All results will be verified")
+    print(f"\n{'='*60}")
+    print(f"AI Web Search Request: {query}")
+    print(f"{'='*60}")
     
     try:
-        data = request.get_json()
-        query = data.get('query', '').strip()
-        
-        if not query:
-            return jsonify({
-                "success": False,
-                "error": "Please provide a software or organization name"
-            }), 400
-        
-        print(f"\n{'='*60}")
-        print(f"AI Web Search Request: {query}")
-        print(f"{'='*60}")
-        
-        # Use the fixed search function with Gemini grounding
         result = search_vulnerabilities_with_ai(query)
         
-        # Add verification statistics
         if result.get('success'):
             result['verification_stats'] = {
                 'total_candidates': result.get('total_checked', 0),
@@ -474,7 +667,6 @@ def api_ai_search():
         
     except Exception as e:
         print(f"[!] Error in AI search: {e}")
-        import traceback
         traceback.print_exc()
         
         return jsonify({
@@ -483,12 +675,9 @@ def api_ai_search():
         }), 500
 
 
-# Add new endpoint for manual CVE verification
 @app.route('/api/verify_cve', methods=['POST'])
 def api_verify_cve():
-    """
-    Manually verify a CVE ID across multiple sources
-    """
+    """Manually verify a CVE ID across multiple sources"""
     data = request.get_json()
     cve_id = data.get('cve_id', '').strip().upper()
     
@@ -502,7 +691,6 @@ def api_verify_cve():
         verifier = CVEVerifier()
         result = verifier.verify_cve_exists(cve_id)
         
-        # Add human-readable summary
         result['summary'] = format_verification_report(
             result.get('verified_sources', []),
             result.get('confidence', 0)
@@ -520,35 +708,9 @@ def api_verify_cve():
         }), 500
 
 
-# Add endpoint to check verification configuration
-@app.route('/api/verification_config')
-def api_verification_config():
-    """
-    Get current verification configuration
-    """
-    from verification_config import (
-        TIER1_SOURCES,
-        TIER2_SOURCES,
-        TIER3_SOURCES,
-        VERIFICATION_RULES
-    )
-    
-    return jsonify({
-        "tier1_sources": len(TIER1_SOURCES),
-        "tier2_sources": len(TIER2_SOURCES),
-        "tier3_sources": len(TIER3_SOURCES),
-        "rules": VERIFICATION_RULES,
-        "tier1_list": list(TIER1_SOURCES.keys()),
-        "description": "Multi-tier verification system to prevent LLM hallucinations"
-    })
-
-
-# Update the CVE details endpoint
 @app.route('/api/cve_details', methods=['POST'])
 def api_cve_details():
-    """
-    Get detailed information about a VERIFIED CVE
-    """
+    """Get detailed information about a VERIFIED CVE"""
     data = request.get_json()
     cve_id = data.get('cve_id', '').strip().upper()
     
@@ -561,7 +723,6 @@ def api_cve_details():
     print(f"[*] Fetching verified details for: {cve_id}")
     
     try:
-        # First verify the CVE exists
         verifier = CVEVerifier()
         verification = verifier.verify_cve_exists(cve_id)
         
@@ -572,10 +733,7 @@ def api_cve_details():
                 "verification": verification
             }), 404
         
-        # Get detailed information
         result = search_vulnerability_details(cve_id)
-        
-        # Add verification info
         result['verification'] = verification
         result['verification_summary'] = format_verification_report(
             verification.get('verified_sources', []),
@@ -590,6 +748,58 @@ def api_cve_details():
             "success": False,
             "error": f"Failed to fetch details: {str(e)}"
         }), 500
+
+
+# ===================================================================
+# STIX GENERATION ROUTES
+# ===================================================================
+
+@app.route('/generate_stix', methods=['POST'])
+def generate_stix():
+    """Start STIX file generation in background"""
+    if not stix_status["is_generating"]:
+        if not os.path.exists(JSON_FILE):
+            return jsonify({
+                "status": "error",
+                "message": "No vulnerability data found. Please run a scan first."
+            }), 400
+        
+        stix_status.update({
+            "is_generating": False,
+            "progress": None,
+            "error": None,
+            "download_ready": False
+        })
+        
+        thread = threading.Thread(target=generate_stix_task, daemon=True)
+        thread.start()
+        return jsonify({"status": "started"})
+    return jsonify({"status": "already_running"})
+
+
+@app.route('/stix_status')
+def get_stix_status():
+    """Get current status of STIX generation"""
+    return jsonify(stix_status)
+
+
+@app.route('/download_stix')
+def download_stix():
+    """Download the generated STIX file"""
+    if os.path.exists(STIX_FILE_PATH):
+        return send_file(
+            STIX_FILE_PATH, 
+            as_attachment=True,
+            download_name=f"vulnerabilities_stix_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            mimetype="application/json"
+        )
+    return "STIX file not found", 404
+
+
+@app.route('/stix_loading')
+def stix_loading_page():
+    """Show STIX generation loading page"""
+    return render_template('stix_loading.html')
 
 
 # ===================================================================
@@ -621,9 +831,15 @@ if __name__ == '__main__':
     print("  ✅ Multi-source vulnerability scanning")
     print("  ✅ AI-powered analysis (Gemini)")
     print("  ✅ Real-time web search (Gemini Grounding)")
+    print("  ✅ Latest exploit tracking")
+    print("  ✅ 24-hour intelligent caching")
     print("  ✅ STIX 2.1 generation")
     print("  ✅ Interactive dashboard")
     print("  ✅ Mitigation finder")
+    print("\n[INFO] Cache Settings:")
+    print(f"  ⏰ Cache Duration: 24 hours")
+    print(f"  💾 Vulnerability Cache: {VULN_CACHE_FILE}")
+    print(f"  💾 Exploit Cache: {EXPLOIT_CACHE_FILE}")
     print("\n[INFO] Server starting at http://localhost:5000")
     print("="*60 + "\n")
     
