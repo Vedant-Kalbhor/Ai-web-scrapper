@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def generate_report(vulnerabilities):
@@ -12,7 +12,7 @@ def generate_report(vulnerabilities):
         f.write("=" * 80 + "\n")
         f.write("🔒 VULNERABILITY SECURITY REPORT\n")
         f.write("=" * 80 + "\n\n")
-        f.write(f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
+        f.write(f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
         f.write(f"Total Vulnerabilities: {len(vulnerabilities)}\n")
         f.write("=" * 80 + "\n\n")
 

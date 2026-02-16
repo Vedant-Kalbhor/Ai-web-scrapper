@@ -6,7 +6,7 @@ from scrape import scrape_all_parallel
 from parse import parse_vulnerabilities_with_ai, generate_ai_insights, find_mitigation
 from report import generate_report
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pickle
 from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
 
@@ -274,7 +274,7 @@ def generate_report_task():
 
         # Generate JSON for dashboard
         dashboard_data = {
-            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "total_vulnerabilities": len(unique_vulns),
             "sources_scanned": len(scraped_data),
             "vulnerabilities": unique_vulns[:50]
@@ -369,7 +369,7 @@ def scrape_exploits_task():
         
         # Save to JSON file
         exploit_data = {
-            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "total_exploits": len(exploits),
             "exploits": exploits,
             "cache_expires": (datetime.now() + CACHE_DURATION).strftime("%Y-%m-%d %H:%M:%S")

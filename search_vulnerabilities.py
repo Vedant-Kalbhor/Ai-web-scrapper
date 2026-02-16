@@ -6,7 +6,7 @@ Prevents LLM hallucinations by verifying against authoritative sources
 import os
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import requests
@@ -213,7 +213,7 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             "total_checked": len(vulnerabilities),
             "verification_rate": f"{len(verified_vulns)}/{len(vulnerabilities)}",
             "vulnerabilities": verified_vulns,
-            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "verification_note": "All results verified against multiple authoritative sources (NVD, MITRE, CISA, CVEDetails, Vulners)"
         }
         
@@ -227,7 +227,7 @@ Return ONLY the JSON array - no markdown, no code blocks, no explanations."""
             "error": str(e),
             "query": query,
             "vulnerabilities": [],
-            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
         }
 
 
@@ -294,7 +294,7 @@ Format as structured text with clear sections."""
             "details": response.content,
             "verified_description": details.get('description'),
             "cvss_score": details.get('cvss_score'),
-            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
         }
         
     except Exception as e:
