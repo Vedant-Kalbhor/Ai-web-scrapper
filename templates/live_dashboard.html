@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Scan Dashboard - OWASP Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --background: #0b0f1a;
+            --surface: #161b2a;
+            --card: #1f2937;
+            --text: #ffffff;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #f59e0b;
+            --low: #10b981;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo { display: flex; align-items: center; gap: 15px; font-size: 1.5rem; font-weight: 800; }
+        .logo i { color: var(--primary); }
+
+        .target-info { background: var(--surface); padding: 10px 20px; border-radius: 40px; border: 1px solid var(--border); font-size: 0.9rem; color: var(--text-dim); }
+        .target-info span { color: var(--primary); font-weight: 700; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-val { font-size: 2.5rem; font-weight: 800; margin-bottom: 5px; }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; }
+
+        .val-critical { color: var(--critical); }
+        .val-high { color: var(--high); }
+        .val-medium { color: var(--medium); }
+        .val-low { color: var(--low); }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .vuln-list-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card-header { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; }
+
+        .vuln-item {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .vuln-item:hover { background: rgba(255,255,255,0.02); }
+
+        .vuln-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-right: 15px;
+        }
+        .badge-critical { background: var(--critical); }
+        .badge-high { background: var(--high); }
+        .badge-medium { background: var(--medium); }
+        .badge-low { background: var(--low); }
+
+        .vuln-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; display: inline-block; }
+        .vuln-url { display: block; font-size: 0.85rem; color: var(--primary); font-family: monospace; margin-bottom: 10px; }
+        .vuln-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 15px; }
+        
+        .evidence-box {
+            background: #000;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #10b981;
+            border-left: 3px solid var(--primary);
+        }
+
+        .chart-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
+
+        .empty-state {
+            padding: 100px;
+            text-align: center;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-virus"></i> LIVE SCAN RESULTS
+            </div>
+            <div class="target-info" id="targetInfo">
+                Target: <span id="targetUrlText">Loading...</span>
+            </div>
+            <a href="/live_scan" style="color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+                <i class="fas fa-plus"></i> New Scan
+            </a>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val val-critical" id="countCritical">0</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val val-high" id="countHigh">0</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val val-medium" id="countMedium">0</div>
+                <div class="stat-label">Medium</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val val-low" id="countLow">0</div>
+                <div class="stat-label">Low</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="vuln-list-card">
+                <div class="card-header">
+                    Vulnerabilities Detected
+                    <span id="totalVulns" style="color: var(--primary);">0 Findings</span>
+                </div>
+                <div id="vulnList">
+                    <div class="empty-state">Calculating results...</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header" style="margin-bottom: 20px; padding: 0; background: none; border: none;">Impact Analysis</div>
+                <canvas id="vulnChart"></canvas>
+                
+                <div style="margin-top: 40px;">
+                    <h4 style="margin-bottom: 15px;">AI Security Advice</h4>
+                    <p id="aiAdvice" style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.6;">
+                        Focus on the critical SQL Injection findings first as they allow full database access. Review your input sanitization logic.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadResults() {
+            try {
+                const res = await fetch('/api/active_scan/results');
+                const data = await res.json();
+                
+                if (data.target_url) {
+                    document.getElementById('targetUrlText').innerText = data.target_url;
+                }
+
+                const vulns = data.vulnerabilities || [];
+                renderResults(vulns);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderResults(vulns) {
+            const list = document.getElementById('vulnList');
+            const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+            
+            if (vulns.length === 0) {
+                list.innerHTML = '<div class="empty-state">No vulnerabilities detected! Great job.</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            vulns.forEach(v => {
+                const severity = v.severity.toLowerCase();
+                counts[severity]++;
+
+                const item = document.createElement('div');
+                item.className = 'vuln-item';
+                item.innerHTML = `
+                    <span class="vuln-badge badge-${severity}">${severity}</span>
+                    <span class="vuln-title">${v.type}</span>
+                    <span class="vuln-url">${v.url}</span>
+                    <div class="vuln-desc">${v.description}</div>
+                    <div class="evidence-box">
+                        <b>Evidence:</b> ${v.evidence} | <b>Payload:</b> ${v.payload || 'N/A'}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            // Update UI counts
+            document.getElementById('countCritical').innerText = counts.critical;
+            document.getElementById('countHigh').innerText = counts.high;
+            document.getElementById('countMedium').innerText = counts.medium;
+            document.getElementById('countLow').innerText = counts.low;
+            document.getElementById('totalVulns').innerText = `${vulns.length} Findings`;
+
+            renderChart(counts);
+        }
+
+        function renderChart(counts) {
+            const ctx = document.getElementById('vulnChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [counts.critical, counts.high, counts.medium, counts.low],
+                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: 'white', padding: 20 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>
