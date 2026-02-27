@@ -191,7 +191,9 @@ report_status = {
     "total_steps": 4
 }
 
-# Active Scanner Global State
+# ===================================================================
+# ACTIVE SCANNER GLOBAL STATE
+# ===================================================================
 active_scan_status = {
     "is_running": False,
     "progress": 0,
