@@ -1,7 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 load_dotenv()
 
@@ -24,8 +24,8 @@ def fetch_latest_cves(limit=50, days_back=7):
     headers = {"apiKey": NVD_API_KEY} if NVD_API_KEY else {}
 
     # Get last X days
-    pub_start = (datetime.utcnow() - timedelta(days=days_back)).strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
-    pub_end = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
+    pub_start = (datetime.now(timezone.utc) - timedelta(days=days_back)).strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
+    pub_end = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
 
     params = {
         "resultsPerPage": limit,

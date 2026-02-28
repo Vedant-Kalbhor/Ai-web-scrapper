@@ -6,7 +6,7 @@ Prevents LLM hallucinations by verifying against multiple authoritative sources
 import requests
 import re
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 from typing import Dict, List, Optional, Tuple
 import time
@@ -58,7 +58,7 @@ class CVEVerifier:
             'verified_sources': [],
             'sources_checked': [],
             'details': {},
-            'verified_at': datetime.utcnow().isoformat() + 'Z'
+            'verified_at': datetime.now(timezone.utc).isoformat() + 'Z'
         }
         
         # Check multiple sources (parallel checks would be faster)
@@ -96,7 +96,7 @@ class CVEVerifier:
         except Exception:
             cve_year = None
 
-        current_year = datetime.utcnow().year
+        current_year = datetime.now(timezone.utc).year
         min_required = 2 if cve_year == current_year else 1
 
         if verified_count >= min_required:

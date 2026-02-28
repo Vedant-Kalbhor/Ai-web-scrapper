@@ -6,7 +6,7 @@ from scrape import scrape_all_parallel
 from parse import parse_vulnerabilities_with_ai, generate_ai_insights, find_mitigation
 from report import generate_report
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pickle
 from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
 # Add this import at the top with others
@@ -23,6 +23,9 @@ from verification_config import (
 
 from exploit_scraper import scrape_all_exploits_parallel
 from exploit_parser import enrich_exploit_with_ai
+
+# New Scanner Imports
+from scanner.engine import ScannerEngine
 
 app = Flask(__name__)
 
@@ -190,6 +193,19 @@ report_status = {
     "total_steps": 4
 }
 
+# ===================================================================
+# ACTIVE SCANNER GLOBAL STATE
+# ===================================================================
+active_scan_status = {
+    "is_running": False,
+    "progress": 0,
+    "status": "Idle",
+    "target_url": "",
+    "vulnerabilities": [],
+    "error": None
+}
+scanner_engine = None
+
 
 def generate_report_task():
     """Optimized report generation with 24-hour caching"""
@@ -285,7 +301,7 @@ def generate_report_task():
 
         # Generate JSON for dashboard
         dashboard_data = {
-            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "total_vulnerabilities": len(unique_vulns),
             "sources_scanned": len(scraped_data),
             "vulnerabilities": unique_vulns[:50]
@@ -380,7 +396,7 @@ def scrape_exploits_task():
         
         # Save to JSON file
         exploit_data = {
-            "generated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "total_exploits": len(exploits),
             "exploits": exploits,
             "cache_expires": (datetime.now() + CACHE_DURATION).strftime("%Y-%m-%d %H:%M:%S")
@@ -830,8 +846,103 @@ def internal_error(e):
 
 
 # ===================================================================
-# MAIN
+# ACTIVE SCANNER ROUTES (OWASP TOP 10)
 # ===================================================================
+
+@app.route('/live_scan')
+def live_scan_page():
+    """Active scanner entry page"""
+    return render_template("live_scan.html")
+
+@app.route('/api/active_scan/start', methods=['POST'])
+def start_active_scan():
+    """Start an active vulnerability scan on a target URL"""
+    global scanner_engine
+    
+    data = request.get_json()
+    target_url = data.get('target_url', '').strip()
+    
+    if not target_url:
+        return jsonify({"error": "Target URL is required"}), 400
+    
+    if not target_url.startswith('http'):
+        target_url = 'http://' + target_url
+
+    if active_scan_status["is_running"]:
+        return jsonify({"error": "A scan is already in progress"}), 400
+
+    active_scan_status.update({
+        "is_running": True,
+        "progress": 0,
+        "status": "Initializing...",
+        "target_url": target_url,
+        "vulnerabilities": [],
+        "error": None
+    })
+
+    def run_scan_thread():
+        global scanner_engine
+        try:
+            scanner_engine = ScannerEngine(target_url)
+            
+            # Helper to update global status from engine
+            def update_progress():
+                import time
+                while scanner_engine.is_running:
+                    active_scan_status["progress"] = scanner_engine.progress
+                    active_scan_status["status"] = scanner_engine.status
+                    time.sleep(0.5)
+
+            progress_thread = threading.Thread(target=update_progress, daemon=True)
+            progress_thread.start()
+
+            vulns = scanner_engine.run_scan()
+            
+            active_scan_status.update({
+                "is_running": False,
+                "progress": 100,
+                "status": "Complete",
+                "vulnerabilities": vulns
+            })
+            
+            # Save results to a separate file if needed
+            with open("active_scan_results.json", "w") as f:
+                json.dump(active_scan_status, f, indent=2)
+                
+        except Exception as e:
+            print(f"[!] Active scan error: {e}")
+            active_scan_status.update({
+                "is_running": False,
+                "error": str(e),
+                "status": "Failed"
+            })
+
+    thread = threading.Thread(target=run_scan_thread, daemon=True)
+    thread.start()
+    
+    return jsonify({"success": True, "message": "Scan started"})
+
+@app.route('/api/active_scan/status')
+def get_active_scan_status():
+    """Get status of current active scan"""
+    return jsonify(active_scan_status)
+
+@app.route('/live_dashboard')
+def live_dashboard():
+    """Dashboard for active scan results"""
+    return render_template("live_dashboard.html")
+
+@app.route('/api/active_scan/results')
+def get_active_scan_results():
+    """Get results of the last/current active scan"""
+    # If not running and no vulns in memory, try to load from file
+    if not active_scan_status["vulnerabilities"] and not active_scan_status["is_running"]:
+        if os.path.exists("active_scan_results.json"):
+            with open("active_scan_results.json", "r") as f:
+                return jsonify(json.load(f))
+    
+    return jsonify(active_scan_status)
+
 
 if __name__ == '__main__':
     print("\n" + "="*60)
