@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,12 +29,12 @@
             --radius: 12px;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background: var(--background);
@@ -55,18 +56,18 @@
         }
 
         .header h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        
-        /* Standard property for compatibility */
-        background-clip: text;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
 
-        /* Vendor prefixes for WebKit browsers (Chrome, Safari) */
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+            /* Standard property for compatibility */
+            background-clip: text;
+
+            /* Vendor prefixes for WebKit browsers (Chrome, Safari) */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
 
         .header .subtitle {
@@ -365,11 +366,30 @@
             letter-spacing: 0.5px;
         }
 
-        .severity-critical { background: var(--accent); color: white; }
-        .severity-high { background: #ed8936; color: white; }
-        .severity-medium { background: var(--warning); color: #333; }
-        .severity-low { background: var(--success); color: white; }
-        .severity-unknown { background: var(--text-light); color: white; }
+        .severity-critical {
+            background: var(--accent);
+            color: white;
+        }
+
+        .severity-high {
+            background: #ed8936;
+            color: white;
+        }
+
+        .severity-medium {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .severity-low {
+            background: var(--success);
+            color: white;
+        }
+
+        .severity-unknown {
+            background: var(--text-light);
+            color: white;
+        }
 
         .insights-box {
             background: var(--surface);
@@ -430,8 +450,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .cvss-score {
@@ -460,15 +485,33 @@
         }
 
         @media (max-width: 768px) {
-            .header h1 { font-size: 2.2rem; }
-            .charts-section { grid-template-columns: 1fr; }
-            .stat-card .value { font-size: 2.2rem; }
-            .search-box { flex-direction: column; }
-            .action-buttons { flex-direction: column; }
-            .btn { justify-content: center; }
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card .value {
+                font-size: 2.2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -479,13 +522,9 @@
         <!-- Search Section -->
         <div class="search-section">
             <div class="search-box">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="search-input" 
+                <input type="text" id="searchInput" class="search-input"
                     placeholder="Search by software, company, CVE ID, or product name..."
-                    onkeypress="if(event.key==='Enter') searchVulnerabilities()"
-                >
+                    onkeypress="if(event.key==='Enter') searchVulnerabilities()">
                 <button class="search-btn" onclick="searchVulnerabilities()">
                     <i class="fas fa-search"></i> Search
                 </button>
@@ -525,6 +564,9 @@
             <a href="/exploits" class="btn btn-secondary">
                 <i class="fas fa-sync-alt"></i> Latest Exploits
             </a>
+            <a href="/live_scan" class="btn btn-primary" style="background: var(--secondary);">
+                <i class="fas fa-crosshairs"></i> OWASP Scanner
+            </a>
         </div>
 
         <div id="chartsSection" class="charts-section"></div>
@@ -551,9 +593,9 @@
 
                 allVulnerabilities = data.vulnerabilities || [];
                 currentDisplayData = allVulnerabilities;
-                
+
                 // Update header
-                document.getElementById("lastUpdated").innerText = 
+                document.getElementById("lastUpdated").innerText =
                     `Last Updated: ${data.generated_at || 'Unknown'} | ${data.total_vulnerabilities || allVulnerabilities.length} Vulnerabilities from ${data.sources_scanned || 'multiple'} sources`;
 
                 // Render dashboard
@@ -717,7 +759,7 @@
         //         }
         //     });
         // }
-            
+
 
         function renderCharts(vulns) {
             const chartsHTML = `
@@ -773,7 +815,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { 
+                            labels: {
                                 padding: 15,
                                 font: { size: 12, family: 'Inter' },
                                 usePointStyle: true
@@ -781,7 +823,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     const label = context.label || '';
                                     const value = context.raw || 0;
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -828,7 +870,7 @@
                         legend: { display: false }
                     },
                     scales: {
-                        x: { 
+                        x: {
                             beginAtZero: true,
                             ticks: { font: { family: 'Inter' } }
                         },
@@ -871,9 +913,9 @@
                 vulns.forEach(v => {
                     const severity = (v.severity || 'UNKNOWN').toUpperCase();
                     const products = (v.affected_products || []).slice(0, 2).join(', ') || 'N/A';
-                    const moreProducts = v.affected_products && v.affected_products.length > 2 ? 
+                    const moreProducts = v.affected_products && v.affected_products.length > 2 ?
                         ` +${v.affected_products.length - 2} more` : '';
-                    
+
                     tableHTML += `
                         <tr>
                             <td><strong>${v.id || 'N/A'}</strong></td>
@@ -937,7 +979,7 @@
 
         async function searchVulnerabilities() {
             const query = document.getElementById('searchInput').value.trim();
-            
+
             if (!query) {
                 alert('Please enter a search term');
                 return;
@@ -981,13 +1023,13 @@
         function clearSearch() {
             isSearchActive = false;
             currentDisplayData = allVulnerabilities;
-            
+
             // Clear input
             document.getElementById('searchInput').value = '';
-            
+
             // Hide search results info
             document.getElementById('searchResultsInfo').classList.remove('active');
-            
+
             // Hide clear button
             document.getElementById('clearBtn').style.display = 'none';
 
@@ -1028,4 +1070,5 @@
         }
     </script>
 </body>
+
 </html>
