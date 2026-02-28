@@ -9,6 +9,8 @@ import json
 from datetime import datetime, timedelta
 import pickle
 from search_vulnerabilities import search_vulnerabilities_with_ai, search_vulnerability_details
+# Add this import at the top with others
+from cve_enrichment import enrich_unknown_vulnerabilities
 
 # Near the top with other imports:
 from enhanced_verification import CVEVerifier, VulnerabilityValidator
@@ -249,6 +251,8 @@ def generate_report_task():
             except Exception as e:
                 print(f"[!] Error parsing {item['source']}: {e}")
 
+
+
         # Remove duplicates
         seen_cves = set()
         unique_vulns = []
@@ -259,13 +263,20 @@ def generate_report_task():
                 unique_vulns.append(vuln)
             elif not cve_id:
                 unique_vulns.append(vuln)
-
+        
         # Sort by severity
         severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "UNKNOWN": 4}
         unique_vulns.sort(key=lambda x: severity_order.get(x.get("severity", "UNKNOWN").upper(), 5))
 
         print(f"[+] Found {len(unique_vulns)} unique vulnerabilities")
-
+                # Step 3.5: Enrich UNKNOWN vulnerabilities using NVD API
+        try:
+            print("\n[🔍] Enriching unknown vulnerabilities via NVD API...")
+            enriched_vulns, enrich_stats = enrich_unknown_vulnerabilities(unique_vulns, max_enrich=30)
+            unique_vulns = enriched_vulns  # Replace with enriched data
+            print(f"[+] Enrichment summary: {enrich_stats}")
+        except Exception as e:
+            print(f"[!] Enrichment step failed: {e}")
         # Step 4: Generate Reports
         report_status["current_step"] = 4
         report_status["progress"] = "Generating reports..."
