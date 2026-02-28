@@ -30,49 +30,49 @@ ULTRA_FAST_SOURCES = [
 
 # FAST SOURCES (APIs and lightweight endpoints)
 FAST_SOURCES = [
-    {
-        "url": "https://www.opencve.io/api/cve",
-        "type": "json",
-        "name": "OpenCVE API",
-        "description": "Recent CVEs via REST API",
-        "speed": "🚀 Fast (< 4s)"
-    },
-    {
-        "url": "https://www.exploit-db.com/",
-        "type": "html",
-        "name": "Exploit-DB",
-        "description": "Exploit database",
-        "speed": "⚡ Medium (5-8s)"
-    }
+    # {
+    #     "url": "https://www.opencve.io/api/cve",
+    #     "type": "json",
+    #     "name": "OpenCVE API",
+    #     "description": "Recent CVEs via REST API",
+    #     "speed": "🚀 Fast (< 4s)"
+    # },
+    # {
+    #     "url": "https://www.exploit-db.com/",
+    #     "type": "html",
+    #     "name": "Exploit-DB",
+    #     "description": "Exploit database",
+    #     "speed": "⚡ Medium (5-8s)"
+    # }
 ]
 
 # MODERATE SOURCES (Requires scraping but still reasonable)
 MODERATE_SOURCES = [
-    {
-        "url": "https://nvd.nist.gov/vuln/recent",
-        "type": "html",
-        "name": "NVD Recent Vulnerabilities",
-        "description": "NVD website recent page",
-        "speed": "🕐 Moderate (8-12s)"
-    },
-    {
-        "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
-        "type": "html",
-        "name": "CISA KEV Catalog",
-        "description": "CISA KEV web page",
-        "speed": "🕐 Moderate (10-15s)"
-    }
+    # {
+    #     "url": "https://nvd.nist.gov/vuln/recent",
+    #     "type": "html",
+    #     "name": "NVD Recent Vulnerabilities",
+    #     "description": "NVD website recent page",
+    #     "speed": "🕐 Moderate (8-12s)"
+    # },
+    # {
+    #     "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+    #     "type": "html",
+    #     "name": "CISA KEV Catalog",
+    #     "description": "CISA KEV web page",
+    #     "speed": "🕐 Moderate (10-15s)"
+    # }
 ]
 
 # SLOW SOURCES (Heavy JavaScript, use only if necessary)
 SLOW_SOURCES = [
-    {
-        "url": "https://www.securityfocus.com/vulnerabilities",
-        "type": "html",
-        "name": "SecurityFocus",
-        "description": "Requires heavy JS rendering",
-        "speed": "🐌 Slow (15-20s)"
-    }
+    # {
+    #     "url": "https://www.securityfocus.com/vulnerabilities",
+    #     "type": "html",
+    #     "name": "SecurityFocus",
+    #     "description": "Requires heavy JS rendering",
+    #     "speed": "🐌 Slow (15-20s)"
+    # }
 ]
 
 
